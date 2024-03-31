@@ -1,0 +1,29 @@
+{
+  "name": "Meme Generator Launcher",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "type": "module",
+  "scripts": {
+    "start": "concurrently --names \"MongoDB,Express,React\" -c \"#00ed64,#f0db4f,#61dafb\" \"npm run db\" \"npm run server\" \"npm run client\"",
+    "startdev": "concurrently --names \"Express,React\" -c \"#f0db4f,#61dafb\" \"npm run startdev --prefix ../apps/meme-generator-backend\" \"npm run client\"",
+    "server": "npm run startdev --prefix ../apps/meme-generator-backend",
+    "client": "npm run dev --prefix ../apps/meme-generator-frontend",
+    "db": "npm start --prefix ../mongoserver",
+    "installall": "npm install && cd ../mongoserver && npm install && cd ../apps/meme-generator-backend && npm install && cd ../../apps/meme-generator-frontend && npm install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TheBormann/MemeGenerator.git"
+  },
+  "keywords": [],
+  "author": "Lukas Bormann",
+  "license": "ISC",
+  "dependencies": {
+    "concurrently": "^8.2.2",
+    "mongodb": "^6.3.0"
+  }
+}
