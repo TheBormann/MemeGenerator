@@ -16,7 +16,7 @@ const SingleView = () => {
 
     return (
         <BaseLayout className='p-0 flex justify-center'>
-            <div className="container mx-2 w-full min-h-screen flex flex-col align-middle justify-center md:px-12">
+            <div className="mx-2 w-full min-h-screen  max-w-3xl flex flex-col align-middle justify-center md:px-12">
                 <div className="w-full flex justify-center">
                     {loading ? (
                         <Skeleton />
@@ -42,7 +42,7 @@ const SingleView = () => {
                     <path d="M9.195 18.44c1.25.714 2.805-.189 2.805-1.629v-2.34l6.945 3.968c1.25.715 2.805-.188 2.805-1.628V8.69c0-1.44-1.555-2.343-2.805-1.628L12 11.029v-2.34c0-1.44-1.555-2.343-2.805-1.628l-7.108 4.061c-1.26.72-1.26 2.536 0 3.256l7.108 4.061Z" />
                     </svg>
                     </button>
-                    <button className={`col-start-1 row-start-4 flex flex-col align-middle justify-center`} onClick={handleUpvote}>
+                    <button className={`col-start-1 row-start-4 flex flex-col align-middle justify-center`} onClick={() => handleUpvote()}>
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={`w-6 h-6 ${image.isLikedByUser ? "fill-error" : ""}`}>
                         <path d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001a.752.752 0 0 1-.704 0l-.003-.001Z" />
                         </svg>

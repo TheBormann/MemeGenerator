@@ -1,22 +1,24 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import ApiController from '../../data/ApiController';
 import SessionManager from "../../data/SessionManager";
 
+const defaultImageState = () => ({
+    id: "Error",
+    title: 'Error - Image not found',
+    caption: 'Error',
+    author: 'Error',
+    createdAt: "Error",
+    url: "Error",
+    comments: [],
+    likes: 0,
+    isLikedByUser: false,
+});
+
 const useMeme = (id) => {
     const username = SessionManager.getUserName();
-    const [image, setImage] = useState({
-        id: "Error",
-        title: 'Error - Image not found',
-        caption: 'Error',
-        author: 'Error',
-        createdAt: "Error",
-        url: "Error",
-        comments: [],
-        likes: 0,
-        isLikedByUser: false,
-    });
-    const [loading, setLoading] = useState(true);
+    const [image, setImage] = useState(defaultImageState);
     const [images, setImages] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [pageNumber, setPageNumber] = useState(0);
     const [memeIndex, setMemeIndex] = useState(0);
@@ -34,99 +36,106 @@ const useMeme = (id) => {
     });
 
     useEffect(() => {
-        let isMounted = true; // Track if the component is mounted
+        if (!id) {
+            setLoading(true);
+            fetchNewData(0);
+            setLoading(false);
+            return;
+        }
 
         const fetchMemeById = async () => {
             setLoading(true);
             try {
                 const meme = await ApiController.fetchMemeById(id);
-                if (isMounted) {
-                    setImage(formatImage(meme));
-                }
+                setImage(formatImage(meme));
             } catch (error) {
                 console.error('Error fetching meme by ID:', error);
-                if (isMounted) {
-                    setError('Failed to fetch meme details');
-                }
+                setError('Failed to fetch meme details');
             } finally {
-                if (isMounted) {
-                    setLoading(false); // Ensure we only set state if component is still mounted
-                }
+                setLoading(false);
             }
         };
 
         fetchMemeById();
-
-        return () => {
-            isMounted = false; // Cleanup function to negate any further state updates on unmounted component
-        };
     }, [id]);
 
-    const fetchNewData = async (pageNum, startIndex) => {
-        try {
-            setLoading(true);
-            if (pageNum !== pageNumber) {
-                const { results } = await ApiController.fetchAllMemes(pageNum);
-                const formattedImages = results.map(formatImage);
-                setImages(formattedImages);
-            }
+    const handleUpvote = async (memeId) => {
+        const targetId = memeId || image.id;
+        await ApiController.like(targetId, username);
 
-            setPageNumber(pageNum);
-            setMemeIndex(startIndex);
-            setImage(images[startIndex]);
-            setLoading(false);
-        } catch (error) {
-            console.error('Error fetching new memes:', error);
-            setError('Failed to fetch new memes');
-            setLoading(false);
+        if (memeId !== undefined) {
+            setImages((prevImages) => prevImages.map((img) => {
+                if (img.id === targetId) {
+                    return {
+                        ...img,
+                        likes: img.isLikedByUser ? img.likes - 1 : img.likes + 1,
+                        isLikedByUser: !img.isLikedByUser,
+                    };
+                }
+                return img;
+            }));
+        } else {
+            setImage((prevImage) => ({
+                ...prevImage,
+                likes: prevImage.isLikedByUser ? prevImage.likes - 1 : prevImage.likes + 1,
+                isLikedByUser: !prevImage.isLikedByUser,
+            }));
         }
     };
 
-    const handleUpvote = () => {
-        ApiController.like(image.id, username);
-        setImage((prevImage) => ({
-            ...prevImage,
-            likes: prevImage.isLikedByUser ? prevImage.likes - 1 : prevImage.likes + 1,
-            isLikedByUser: !prevImage.isLikedByUser,
-        }));
-      };
-
-      const handleComment = async (commentText) => {
+    const handleComment = async (commentText) => {
         if (!commentText.trim()) return;
-    
         await ApiController.addComment(image.id, commentText, username);
         setImage((prevImage) => ({
             ...prevImage,
             comments: [...prevImage.comments, { author: username, comment: commentText }],
         }));
-      };
+    };
 
-    const handleNext = () => {
-        if (memeIndex + 1 >= ApiController.PAGE_LIMIT) {
-            if (images.length <= memeIndex + 1) {
-                console.log('Already at the last meme');
-                return;
+    const fetchNewData = async (pageNum, startIndex = 0, append = false) => {
+        setLoading(true);
+        try {
+            const { results } = await ApiController.fetchAllMemes(pageNum);
+            const formattedImages = results.map(formatImage);
+
+            // If pageNum is the next sequential page, append new images to the existing ones
+            if (append) {
+                setImages(prevImages => [...prevImages, ...formattedImages]);
+            } else {
+                setImages(formattedImages);
             }
-            fetchNewData(pageNumber + 1, 0);
-        }else {
-            fetchNewData(pageNumber, memeIndex + 1);
+
+            setPageNumber(pageNum);
+            setMemeIndex(startIndex);
+            // Set the first image of the new batch if not appending, or maintain the current image if we are
+            setImage(pageNum === pageNumber + 1 ? image : formattedImages[startIndex]);
+        } catch (error) {
+            console.error('Error fetching new memes:', error);
+            setError('Failed to fetch new memes');
+        } finally {
+            setLoading(false);
         }
     };
 
-    const handlePrev = () => {
-        if (memeIndex - 1 < 0) {
-            if (pageNumber <= 0) {
-                console.log('Already at the first meme');
-                return;
-            }
-            fetchNewData(pageNumber - 1, 9);
+    const fetchNextPage = () => {
+        fetchNewData(pageNumber + 1, 0, true);
+    };
+
+    const handleNextPrevCommon = useCallback((direction) => {
+        const newIndex = memeIndex + direction;
+        if (newIndex < 0 || newIndex >= images.length) {
+            const newPageNumber = pageNumber + direction;
+            fetchNewData(newPageNumber, direction === 1 ? 0 : ApiController.PAGE_LIMIT - 1);
         } else {
-            fetchNewData(pageNumber, memeIndex - 1);
+            setMemeIndex(newIndex);
+            setImage(images[newIndex]);
         }
-    };
+    }, [memeIndex, images, pageNumber]);
 
-    return { image, images, loading, error, setImage, setImages, setPageNumber,
-        handleUpvote, handleComment, handleNext, handlePrev };
+    const handleNext = () => handleNextPrevCommon(1);
+    const handlePrev = () => handleNextPrevCommon(-1);
+
+    return { image, images, loading, error, setImage, setImages, setPageNumber, handleUpvote, handleComment, fetchNextPage, handleNext, handlePrev };
 };
 
 export default useMeme;

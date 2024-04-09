@@ -167,7 +167,7 @@ const Home = () => {
             <div className="text-center py-10">No memes</div>
           )}
           {loading && (
-            <span className="loading loading-dots loading-lg mx-auto"></span>
+            <span className="loading loading-spinner loading-lg mx-auto"></span>
           )}
         </div>
       </div>
