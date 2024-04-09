@@ -1,0 +1,32 @@
+{
+  "name": "basic-auth-app",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "startdev": "nodemon ./bin/www",
+    "start": "env-cmd nodemon ./bin/www"
+  },
+  "dependencies": {
+    "archiver": "^6.0.1",
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.2",
+    "cookie-parser": "~1.4.6",
+    "cors": "^2.8.5",
+    "debug": "~4.3.4",
+    "dotenv": "^16.3.1",
+    "env-cmd": "^10.1.0",
+    "express": "~4.18.2",
+    "http-errors": "~2.0.0",
+    "jade": "~1.11.0",
+    "jimp": "^0.22.10",
+    "monk": "7.3.4",
+    "morgan": "~1.10.0",
+    "multer": "^1.4.5-lts.1",
+    "njwt": "^2.0.0",
+    "nodemailer": "^6.9.7",
+    "nodemon": "^3.0.1",
+    "sharp": "^0.33.2",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0"
+  }
+}
