@@ -22,7 +22,7 @@ const MemeCard = ({ meme, handleUpvote }) => {
   }
 
   return (
-      <div className="card lg:card-side bg-base-100 ">
+      <div className="card lg:card-side bg-base-100 h-[90vh]">
         <div
           className={`backdrop-blur-3xl lg:h-[78vh] h-[50vh] max-w-screen-lg w-full flex justify-center relative cursor-pointer`}
           onClick={handleRedirection}
@@ -30,7 +30,7 @@ const MemeCard = ({ meme, handleUpvote }) => {
           <img
             src={meme.url}
             alt={`${meme.title} background blur`}
-            className={`object-cover w-[80%] h-[80%] mt-[10%] md:mt-[0%] absolute blur-2xl`}
+            className={`object-cover w-[90%] h-[90%] md:w-[60%] md:h-[60%] lg:w-[80%] lg:h-[80%] mt-[10%] md:mt-[0%] absolute blur-2xl`}
           />
           <img
             src={meme.url}
@@ -50,9 +50,9 @@ const MemeCard = ({ meme, handleUpvote }) => {
           </span>
           <p className="col-start-1 row-start-2 col-span-2">{meme.caption}</p>
           
-          <div className="col-start-1 row-start-3 col-span-2 mt-8 align-bottom flex gap-4 justify-center">
+          <div className="col-start-1 row-start-3 col-span-2 flex gap-4 align-middle justify-center">
               <button
-                  className={`btn btn-rounded btn-outline`}
+                  className={`btn btn-rounded btn-outline self-center`}
                   onClick={handleRedirection}
                 >
                 Comment

@@ -27,12 +27,12 @@ const History = () => {
   }, [fetchNewData, loading]);
 
   return (
-    <BaseLayout showFooter={false} className="pt-0">
+    <BaseLayout showFooter={false} className="pt-0 overflow-clip">
       <div ref={contentRef} className="min-h-screen w-full flex flex-col snap-mandatory snap-y px-4 md:px-8 py-4 overflow-auto h-screen">
         {images.length > 0 ? (
           images.map((meme, index) => (
-            <div key={index} className="snap-start h-screen">
-              <MemeCard meme={meme} handleUpvote={handleUpvote}/>
+            <div key={index} className="snap-start">
+              <MemeCard meme={meme} handleUpvote={handleUpvote} className={index === 0 ? `pt-12` : ''}/>
             </div>
           ))
         ) : (
