@@ -120,6 +120,7 @@ const Settings = () => {
                 type="checkbox"
                 name="readoutOnFeed"
                 id="readoutOnFeed"
+                className='toggle'
     
               />
               <label htmlFor="readoutOnFeed" className="ml-2">Read feed</label>
@@ -129,6 +130,7 @@ const Settings = () => {
                 type="checkbox"
                 name="readoutInDetail"
                 id="readoutInDetail"
+                className='toggle'
              
               />
               <label htmlFor="readoutInDetail" className="ml-2">Read on meme detail page</label>
@@ -138,7 +140,7 @@ const Settings = () => {
                 type="checkbox"
                 name="readoutComments"
                 id="readoutComments"
-          
+                className='toggle'
               />
               <label htmlFor="readoutComments" className="ml-2">Read comments</label>
             </div>

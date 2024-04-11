@@ -1,9 +1,6 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
 
-const MemeFilter = ({ onSortChange, onFilterChange }) => {
-  const handleSortChange = (e) => {
-    onSortChange(e.target.value);
-  };
+const MemeFilter = ({ onFilterChange, visible }) => {
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
@@ -11,79 +8,30 @@ const MemeFilter = ({ onSortChange, onFilterChange }) => {
   };
 
   return (
-    <div className="p-4 bg-gray-100 border-b border-gray-200">
-      <div className="flex items-center space-x-4">
-        <div className="flex items-center">
-          <label className="mr-2" htmlFor="sort">
-            Sort by:
-          </label>
-          <select
-            id="sort"
-            className="p-2 border rounded-md"
-            onChange={handleSortChange}
-          >
-            <option value="creationDateDesc">Creation Date (New->Late)</option>
-            <option value="creationDateAsc">Creation Date (Late->New)</option>
-            <option value="votesDesc">Votes (Descending)</option>
-            <option value="votesAsc">Votes (Ascending)</option>
-          </select>
+      <div className={`fixed top-20 left-0 right-0 join z-30 flex justify-center ${!visible ? 'translate-y-[-100vh] transition-transform duration-500' : ''}`}>
+        <div>
+          <div>
+            <input className="input input-bordered join-item" placeholder="Search"/>
+          </div>
         </div>
-
-        <div className="flex items-center space-x-4">
-          <div className="flex items-center">
-            <label className="mr-2" htmlFor="filterBefore">
-              Creation Date Before:
-            </label>
-            <input
+        <select className="select select-bordered join-item">
+          <option disabled selected>Sort</option>
+          <option value="creationDateDesc">Date ↘</option>
+          <option value="creationDateAsc">Date ↖</option>
+          <option value="votesDesc">Votes ↘</option>
+          <option value="votesAsc">Votes ↖</option>
+        </select>
+        <input
               type="date"
               id="filterBefore"
               name="creationDateBefore"
-              className="p-2 border rounded-md"
+              className="input input-bordered join-item"
               onChange={handleFilterChange}
             />
-          </div>
-
-          <div className="flex items-center">
-            <label className="mr-2" htmlFor="filterAfter">
-              Creation Date After:
-            </label>
-            <input
-              type="date"
-              id="filterAfter"
-              name="creationDateAfter"
-              className="p-2 border rounded-md"
-              onChange={handleFilterChange}
-            />
-          </div>
-
-          <div className="flex items-center">
-            <label className="mr-2" htmlFor="filterVotes">
-              Votes:
-            </label>
-            <input
-              type="number"
-              id="filterVotes"
-              name="votes"
-              className="p-2 border rounded-md"
-              onChange={handleFilterChange}
-            />
-          </div>
-
-          <div className="flex items-center">
-            <label className="mr-2" htmlFor="filterKeyword">
-              Keyword:
-            </label>
-            <input
-              type="text"
-              id="filterKeyword"
-              name="keyword"
-              className="p-2 border rounded-md"
-              onChange={handleFilterChange}
-            />
-          </div>
+        <div className="indicator">
+          <button className="btn join-item" onClick={handleFilterChange}>Search</button>
         </div>
       </div>
-    </div>
   );
 };
 

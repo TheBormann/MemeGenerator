@@ -2,19 +2,19 @@ import React, { useEffect, useState, useRef } from 'react';
 import ApiController from '../data/ApiController';
 import BaseLayout from '../components/layout/BaseLayout';
 import MemeCard from "../components/explore/MemeCard";
+import useMeme from '../components/single-view/useMeme.jsx';
 import useTextToSpeech from "../components/editor/useTextToSpeech";
 import MemeFilter from "../components/explore/MemeFilter";
 
 const Home = () => {
-  const [memes, setMemes] = useState([]);
-  let page = 0;
-  const [loading, setLoading] = useState(false);
+  const { loading, images, fetchNextPage, handleUpvote, error } = useMeme();
   const [showFab, setShowFab] = useState(false);
+
+  const contentRef = useRef(null);
 
   const [jsonData, setJsonData] = useState(null);
   useTextToSpeech(jsonData);
 
-  const contentRef = useRef(null);
   const observer = useRef(null);
 
   const [sortedBy, setSortedBy] = useState("creationDateDesc");
@@ -24,64 +24,38 @@ const Home = () => {
     votes: 0,
     keyword: "",
   });
+  //TODO: fetch data with initial sorting and filter
 
-  const fetchData = async (filter, sortedBy) => {
-    setLoading(true);
-    try {
-      const data = await ApiController.fetchAllMemes(
-        page,
-        10,
-        filter,
-        sortedBy
-      );
+  useEffect(() => {
+    const handleScroll = () => {
+      const content = contentRef.current;
+      if (content) {
+        // Check if the user has scrolled to the bottom of the content
+        const isBottom = content.scrollHeight - content.scrollTop <= content.clientHeight;
+        if (isBottom && !loading) {
+          fetchNextPage();
+        }
 
-      const newMemes = data.results;
-      setMemes((prevMemes) => [...prevMemes, ...newMemes]);
-
-      if (newMemes.length > 0) {
-        if (data.next && typeof data.next.page !== "undefined") {
-          page = data.next.page;
+        if (content.scrollTop > 200) {
+          setShowFab(true);
         } else {
-          page++;
+          setShowFab(false);
         }
       }
-    } catch (error) {
-      console.error("Error fetching meme list:", error);
-    }
-    setLoading(false);
-  };
+    };
 
-  const handleScroll = () => {
     const content = contentRef.current;
-
-    const bottom =
-      content.scrollHeight - content.scrollTop === content.clientHeight;
-    if (bottom) {
-      fetchData(filter, sortedBy); // Updated to include filter and sortedBy as parameters
+    if (content) {
+      content.addEventListener("scroll", handleScroll);
+      return () => content.removeEventListener("scroll", handleScroll);
     }
-
-    if (content.scrollTop > 200) {
-      setShowFab(true);
-    } else {
-      setShowFab(false);
-    }
-  };
+  }, [fetchNextPage, loading]);
 
   const scrollToTop = () => {
     if (contentRef.current) {
       contentRef.current.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
-
-  useEffect(() => {
-    const content = contentRef.current;
-    content.addEventListener("scroll", handleScroll);
-    return () => content.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  useEffect(() => {
-    fetchData(filter, sortedBy);
-  }, []);
 
   useEffect(() => {
     const memeElements = document.querySelectorAll(".meme-card");
@@ -106,12 +80,11 @@ const Home = () => {
     return () => {
       observer.current.disconnect();
     };
-  }, [memes]);
+  }, [images]);
 
   const onSortChange = (value) => {
     setSortedBy(value);
-    setMemes([]);
-    fetchData(filter, value);
+    //TODO: fetch data with new sorting
   };
 
   const onFilterChange = (name, value) => {
@@ -137,46 +110,41 @@ const Home = () => {
       default:
         break;
     }
-    setMemes([]);
-
-    fetchData(newFilter, sortedBy);
+    //TODO: fetch data with new filter
   };
 
   return (
     <BaseLayout showFooter={false} className='p-0'>
       <MemeFilter
-        onSortChange={onSortChange}
         onFilterChange={onFilterChange}
-      ></MemeFilter>
-      <div
-        ref={contentRef}
-        className="gap-4 overflow-x-hidden overflow-scroll snap-mandatory snap-y h-[85vh]"
-      >
-        <div className="p-5 flex flex-col lg:mx-32">
-          {memes.length > 0 ? (
-            memes.map((meme, index) => (
-              <div
-                key={index}
-                className="flex-none w-full snap-start meme-card"
-                data-id={meme.id}
-              >
-                <MemeCard meme={meme} />
-              </div>
-            ))
-          ) : !loading && (
-            <div className="text-center py-10">No memes</div>
-          )}
-          {loading && (
-            <span className="loading loading-spinner loading-lg mx-auto"></span>
-          )}
-        </div>
+        visible={!showFab}
+        className="fixed"
+      />
+      <div ref={contentRef} className="h-screen w-full flex flex-col snap-mandatory snap-y px-4 md:px-8 overflow-auto">
+        {images.length > 0 ? (
+          images.map((meme, index) => (
+            <div key={index} className="snap-start meme-card">
+              <MemeCard meme={meme} handleUpvote={handleUpvote} className={index === 0 ? `mt-24` : ''}/>
+            </div>
+          ))
+        ) : (
+          !loading && <div className="text-center">No memes found.</div>
+        )}
+        {loading && (
+          <div className="flex justify-center">
+            <span className="spinner"></span> {/* Ensure you have a spinner styled or use DaisyUI's spinner */}
+          </div>
+        )}
+        {error && <div className="text-red-500 text-center">Failed to load memes: {error}</div>}
       </div>
       {showFab && (
         <button
-          className="btn btn-outline btn-accent fixed bottom-8 right-8 p-3  shadow-2xl"
+          className="btn btn-outline btn-secondary fixed bottom-8 right-8 p-3  shadow-2xl"
           onClick={scrollToTop}
         >
-          Go To Top
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+            <path fillRule="evenodd" d="M11.47 2.47a.75.75 0 0 1 1.06 0l7.5 7.5a.75.75 0 1 1-1.06 1.06l-6.22-6.22V21a.75.75 0 0 1-1.5 0V4.81l-6.22 6.22a.75.75 0 1 1-1.06-1.06l7.5-7.5Z" clipRule="evenodd" />
+          </svg>
         </button>
       )}
     </BaseLayout>
