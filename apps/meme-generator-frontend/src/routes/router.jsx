@@ -13,6 +13,7 @@ import AuthenticatedWrapper from './AuthenticatedWrapper.jsx';
 import SingleView from "../screens/SingleView.jsx";
 import SetNewPassword from "../screens/SetNewPassword.jsx";
 import Statistics from "../screens/Statistics.jsx";
+import SelectTemplate from "../screens/SelectTemplate.jsx";
 
 export const router = createBrowserRouter([
   {
@@ -63,6 +64,15 @@ export const router = createBrowserRouter([
     errorElement: <Error />,
   },
   {
+    path: "/select-template",
+    element: (
+      <AuthenticatedWrapper>
+        <SelectTemplate />
+      </AuthenticatedWrapper>
+    ),
+    errorElement: <Error />,
+  },
+  {
     path: "/create-meme",
     element: (
       <AuthenticatedWrapper>
@@ -72,7 +82,7 @@ export const router = createBrowserRouter([
     errorElement: <Error />,
   },
   {
-    path: "/Add-Method",
+    path: "/add-template",
     element: (
       <AuthenticatedWrapper>
         <AddMethodEditor />

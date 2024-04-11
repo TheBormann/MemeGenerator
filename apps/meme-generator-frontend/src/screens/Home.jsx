@@ -150,7 +150,7 @@ const Home = () => {
       ></MemeFilter>
       <div
         ref={contentRef}
-        className="gap-4  overflow-x-hidden overflow-scroll snap-mandatory snap-y h-[85vh]"
+        className="gap-4 overflow-x-hidden overflow-scroll snap-mandatory snap-y h-[85vh]"
       >
         <div className="p-5 flex flex-col lg:mx-32">
           {memes.length > 0 ? (

@@ -28,7 +28,7 @@ const Navbar = (props) => {
         </div>
 
         <div className="flex-none">
-          <Link to="/create-meme" className="btn-ghost btn-circle btn">
+          <Link to="/select-template" className="btn-ghost btn-circle btn">
             <div className="indicator">
               <svg
                 xmlns="http://www.w3.org/2000/svg"

@@ -5,12 +5,12 @@ import { useSpeech } from "./useSpeechToText";
 import ApiController from "../../data/ApiController";
 import SessionManager from "../../data/SessionManager";
 import ListeningButton from "./ListeningButton";
-import ImageService from "../../data/services/imageService";
 import {
   createNewImage,
   formatBytes,
   getFileSizeFromBase64,
 } from "../../utils/imageUtils";
+const API_BASE_URL = ApiController.API_BASE_URL;
 
 function EditorWindow({
   draft,
@@ -74,6 +74,11 @@ function EditorWindow({
       setEditingState("edit");
     }
   }, [draft]);
+
+  const toSrcPath = (suffix) => {
+    return `${API_BASE_URL}/${suffix}`;
+}
+
 
   const handleResize = (event, corner, index) => {
     const container = event.target.parentNode;
@@ -330,7 +335,7 @@ function EditorWindow({
     try {
       const response = await ApiController.createMeme(formData);
       const newImageURL = response.imageURL;
-      setSingleViewURL(ImageService.toSrcPath(newImageURL));
+      setSingleViewURL(toSrcPath(newImageURL));
 
       setHasUploadedMeme(true);
       console.log("Post successfull");

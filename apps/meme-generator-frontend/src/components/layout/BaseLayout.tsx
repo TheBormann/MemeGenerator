@@ -1,25 +1,19 @@
-import type {
-  JSXElementConstructor,
-  ReactElement,
-  ReactFragment,
-  ReactPortal,
-} from "react";
+import React from "react";
 import Footer from "../base/Footer";
 import Navbar from "../base/Navbar";
 
-const BaseLayout = (props: {
-  className?: string;
-  children:
-  | ReactElement<any, string | JSXElementConstructor<any>>
-  | ReactFragment
-  | ReactPortal;
-  showFooter?: boolean;
-}) => (
-  <>
-    <Navbar hasSidebar={false} />
-    <main className={props.className || `pt-12`}>{props.children}</main>
-    {props.showFooter !== false && <Footer />}
-  </>
-);
+const BaseLayout = (props) => {
+  return (
+    <>
+      <div className="fixed top-0 w-full z-50">
+        <Navbar hasSidebar={false} />
+      </div>
+      <main className={` ${props.className || 'pt-24'}`}>
+        {props.children}
+      </main>
+      {props.showFooter !== false && <Footer />}
+    </>
+  );
+};
 
 export default BaseLayout;

@@ -4,16 +4,21 @@ import { Link } from "react-router-dom";
 import EditorWindow from '../components/editor/EditorWindow';
 import useTemplate from '../components/editor/useTemplate';
 
-const CreateMemePage = () => {
+const SelectTemplate = () => {
     const { templates, draft, loading, filterOptions, randomizeTemplate, updateSelectedTemplate, selectNextTemplate, selectPrevTemplate, onFilterChange } = useTemplate();
+
+    useEffect(() => {
+        console.log('Draft has been updated', draft);
+    }, [draft]);
+
 
     return (
         <BaseLayout>
             <div className="justify-left grid min-h-screen max-w-full px-6 align-top md:justify-center md:px-12 mx-auto w-[1070px]">
                 <div className="h-fit ">
-                    <h1 className="text-5xl font-bold pb-5">Create Your Meme</h1>
+                    <h1 className="text-5xl font-bold pb-5">Select Template</h1>
                 </div>
-                <EditorWindow draft={draft} isLoading={loading} onSelectNextTemplate={selectNextTemplate} onSelectPrevTemplate={selectPrevTemplate} onRandomizeTemplate={randomizeTemplate}></EditorWindow>
+                <img src={draft.imageUrl} alt={`Meme ${draft.templateId}`} className="flex object-contain max-h-[70vh] justify-center" />
                 <div className="flex flew-row justify-between mt-8 mb-2">
                     <h2 className="text-xl pl-3 font-bold py-2">Uploaded Templates:</h2>
                     <Link to="/add-template" className="link link-accent flex items-center justify-center font-bold py-2 px-4 rounded">
@@ -57,4 +62,4 @@ const CreateMemePage = () => {
     );
 };
 
-export default CreateMemePage;
+export default SelectTemplate;

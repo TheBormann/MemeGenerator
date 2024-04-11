@@ -109,6 +109,41 @@ const Settings = () => {
           <button type="submit" className="btn-primary btn mt-8">Save</button>
           {errorMessage && <p className="text-error mt-2">{errorMessage}</p>}
         </SettingsSegment>
+
+        <SettingsSegment
+          title="Text-to-Speech Settings"
+          desc="Customize how text-to-speech is used in the application."
+        >
+          <div className="flex flex-col gap-4">
+            <div>
+              <input
+                type="checkbox"
+                name="readoutOnFeed"
+                id="readoutOnFeed"
+    
+              />
+              <label htmlFor="readoutOnFeed" className="ml-2">Read feed</label>
+            </div>
+            <div>
+              <input
+                type="checkbox"
+                name="readoutInDetail"
+                id="readoutInDetail"
+             
+              />
+              <label htmlFor="readoutInDetail" className="ml-2">Read on meme detail page</label>
+            </div>
+            <div>
+              <input
+                type="checkbox"
+                name="readoutComments"
+                id="readoutComments"
+          
+              />
+              <label htmlFor="readoutComments" className="ml-2">Read comments</label>
+            </div>
+          </div>
+        </SettingsSegment>
       </form>
     </BaseLayout>
   );

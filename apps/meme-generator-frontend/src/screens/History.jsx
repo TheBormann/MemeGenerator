@@ -2,9 +2,10 @@ import React, { useEffect, useRef } from "react";
 import MemeCard from "../components/explore/MemeCard";
 import BaseLayout from "../components/layout/BaseLayout";
 import useMeme from '../components/single-view/useMeme.jsx';
+import Footer from "../components/base/Footer.jsx";
 
 const History = () => {
-  const { loading, images, fetchNewData, handleUpvote, error } = useMeme();
+  const { loading, images, fetchNextPage, handleUpvote, error } = useMeme();
   const contentRef = useRef(null);
 
   useEffect(() => {
@@ -14,7 +15,7 @@ const History = () => {
         // Check if the user has scrolled to the bottom of the content
         const isBottom = content.scrollHeight - content.scrollTop <= content.clientHeight;
         if (isBottom && !loading) {
-          fetchNewData();
+          fetchNextPage();
         }
       }
     };
@@ -24,15 +25,15 @@ const History = () => {
       content.addEventListener("scroll", handleScroll);
       return () => content.removeEventListener("scroll", handleScroll);
     }
-  }, [fetchNewData, loading]);
+  }, [fetchNextPage, loading]);
 
   return (
-    <BaseLayout showFooter={false} className="pt-0 overflow-clip">
-      <div ref={contentRef} className="min-h-screen w-full flex flex-col snap-mandatory snap-y px-4 md:px-8 py-4 overflow-auto h-screen">
+    <BaseLayout showFooter={false} className="pt-0">
+      <div ref={contentRef} className="h-screen w-full flex flex-col snap-mandatory snap-y px-4 md:px-8 overflow-auto">
         {images.length > 0 ? (
           images.map((meme, index) => (
-            <div key={index} className="snap-start">
-              <MemeCard meme={meme} handleUpvote={handleUpvote} className={index === 0 ? `pt-12` : ''}/>
+            <div key={index} className="snap-start meme-card">
+              <MemeCard meme={meme} handleUpvote={handleUpvote} className={index === 0 ? `mt-24` : ''}/>
             </div>
           ))
         ) : (
@@ -45,7 +46,6 @@ const History = () => {
         )}
         {error && <div className="text-red-500 text-center">Failed to load memes: {error}</div>}
       </div>
-      
     </BaseLayout>
   );
 };
