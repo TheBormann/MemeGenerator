@@ -244,6 +244,7 @@ const ApiController = {
 
       const data = await response.json();
       sessionStorage.setItem("authToken", data.token);
+      sessionStorage.setItem("authExpiration", data.expiration);
       sessionStorage.removeItem("userData");
       return data;
     } catch (error) {

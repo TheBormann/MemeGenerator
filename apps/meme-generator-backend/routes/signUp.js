@@ -80,11 +80,12 @@ router.post("/", async (req, res) => {
 
     // Create JWT token for the new user
     const claims = { userId: newUser._id };
-    const jwt = njwt.create(claims, process.env.JWT_SECRET); // Use environment variable for JWT secret
-    jwt.setExpiration(new Date().getTime() + 60 * 60 * 1000); // 1 hour
+    const jwt = njwt.create(claims, process.env.JWT_SECRET);
+    const expiration = new Date(jwt.body.exp * 1000); // 1 hour
+    jwt.setExpiration(expiration); 
     const token = jwt.compact();
 
-    res.status(201).json({ message: "Account created successfully", token });
+    res.status(201).json({ message: "Account created successfully", token, expiration });
   } catch (error) {
     if (error.name === "ValidationError") {
       res.status(400).json({ message: "Invalid user data" });

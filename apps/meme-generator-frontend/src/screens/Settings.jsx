@@ -34,8 +34,6 @@ const Settings = () => {
     }
 
     try {
-      console.log('formData', formData);
-      console.log('sessionStorage', sessionStorage.getItem('userData'));
       await ApiController.postUserDataChanges(formData);
       sessionStorage.removeItem('userData');
       await ApiController.fetchUserData();

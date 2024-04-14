@@ -68,14 +68,15 @@ router.post("/", async (req, res) => {
 
     const claims = { userId: user._id };
     const jwt = njwt.create(claims, process.env.JWT_SECRET);
-    jwt.setExpiration(new Date().getTime() + 60 * 60 * 1000); // 1 hour
+    const expiration = new Date(jwt.body.exp * 1000); // 1 hour
+    jwt.setExpiration(expiration); 
 
     console.error(claims);
 
     const token = jwt.compact();
-    res.send({ token });
+    res.send({ token, expiration });
   } catch (error) {
-    console.error("Error loggin in:", error);
+    console.error("Error logging in:", error);
     res.status(500).json({ message: "Server error" });
   }
 });

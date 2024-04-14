@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ApiController from '../data/ApiController';
 
+// TODO: store expiration time in the session storage
+
 const AuthenticatedWrapper = ({ children }) => {
     const navigate = useNavigate();
     const [isUserAuthenticated, setIsUserAuthenticated] = useState(false);
@@ -9,15 +11,15 @@ const AuthenticatedWrapper = ({ children }) => {
     useEffect(() => {
         const checkAuthentication = async () => {
             const currentAuthToken = sessionStorage.getItem('authToken');
+            const expiration = sessionStorage.getItem('authExpiration');
             if (!currentAuthToken) {
                 navigate('/login');
                 return;
             }
-
-            // Validate the token
-            const isValidToken = await ApiController.validateToken();
-            if (!isValidToken) {
-                sessionStorage.removeItem('authToken'); // Clear invalid token
+            
+            if (expiration && new Date(expiration) < new Date()) {
+                sessionStorage.removeItem('authToken');
+                sessionStorage.removeItem('authExpiration');
                 navigate('/login');
                 return;
             }
@@ -29,7 +31,8 @@ const AuthenticatedWrapper = ({ children }) => {
                     await ApiController.fetchUserData();
                     setIsUserAuthenticated(true);
                 } catch (error) {
-                    sessionStorage.removeItem('authToken'); // if user cannot be found there must be another problem
+                    sessionStorage.removeItem('authToken');
+                    sessionStorage.removeItem('authExpiration');
                     navigate('/login');
                 }
             } else {
