@@ -82,7 +82,12 @@ const ApiController = {
     }
   },
 
-  async fetchAllMemes(page, limit = this.PAGE_LIMIT, filter = null, sortedBy = null) {
+  async fetchAllMemes(
+    page,
+    limit = this.PAGE_LIMIT,
+    filter = null,
+    sortedBy = null
+  ) {
     try {
       let url = `${API_BASE_URL}/memes?page=${page}&limit=${limit}`;
 

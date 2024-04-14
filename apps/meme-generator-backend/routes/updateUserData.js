@@ -40,7 +40,7 @@ var router = express.Router();
 router.post("/", authenticateToken, async (req, res) => {
   try {
     const userId = req.user.userId; // Retrieved from the JWT
-    const { username, password } = req.body;
+    const { username, password, read_feed, read_details, read_comments } = req.body;
 
     // Input Validation
     if (!userId || (!username && !password)) {
@@ -59,6 +59,9 @@ router.post("/", authenticateToken, async (req, res) => {
     // Update username and/or password
     if (username) user.username = username;
     if (password) user.password = await bcrypt.hash(password, 8);
+    user.read_feed = read_feed;
+    user.read_details = read_details;
+    user.read_comments = read_comments;
 
     // Save the updated user information
     await users.update({ _id: userId }, { $set: user });

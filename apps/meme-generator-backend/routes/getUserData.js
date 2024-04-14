@@ -51,8 +51,8 @@ router.get("/", authenticateToken, async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const { username, email } = user;
-    res.status(200).json({ username, email });
+    const { username, email, read_feed, read_details, read_comments } = user;
+    res.status(200).json({ username, email, read_feed, read_details, read_comments });
   } catch (error) {
     console.error("Error in getUserData:", error);
     res.status(500).json({ message: "Internal server error" });

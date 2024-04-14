@@ -10,12 +10,19 @@ const Settings = () => {
     email: JSON.parse(sessionStorage.getItem('userData')).email || '',
     username: JSON.parse(sessionStorage.getItem('userData')).username || '',
     password: '',
-    repeatPassword: ''
+    repeatPassword: '',
+    read_feed: JSON.parse(sessionStorage.getItem('userData')).read_feed || false,
+    read_details: JSON.parse(sessionStorage.getItem('userData')).read_details || false,
+    read_comments: JSON.parse(sessionStorage.getItem('userData')).read_comments || false,
   });
   const [errorMessage, setErrorMessage] = useState('');
 
   const handleInputChange = (e) => {
+    if (e.target.type === 'checkbox') {
+      setFormData({ ...formData, [e.target.name]: e.target.checked });
+    } else {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -27,8 +34,11 @@ const Settings = () => {
     }
 
     try {
+      console.log('formData', formData);
+      console.log('sessionStorage', sessionStorage.getItem('userData'));
       await ApiController.postUserDataChanges(formData);
       sessionStorage.removeItem('userData');
+      await ApiController.fetchUserData();
       navigate('/');
     } catch (error) {
       const errorMessage = error.response && error.response.data && error.response.data.message 
@@ -118,33 +128,39 @@ const Settings = () => {
             <div>
               <input
                 type="checkbox"
-                name="readoutOnFeed"
-                id="readoutOnFeed"
+                name="read_feed"
+                id="read_feed"
                 className='toggle'
-    
+                checked={formData.read_feed}
+                onChange={handleInputChange}
               />
-              <label htmlFor="readoutOnFeed" className="ml-2">Read feed</label>
+              <label htmlFor="read_feed" className="ml-2">Read feed</label>
             </div>
             <div>
               <input
                 type="checkbox"
-                name="readoutInDetail"
-                id="readoutInDetail"
+                name="read_details"
+                id="read_details"
                 className='toggle'
-             
+                checked={formData.read_details}
+                onChange={handleInputChange}
               />
-              <label htmlFor="readoutInDetail" className="ml-2">Read on meme detail page</label>
+              <label htmlFor="read_details" className="ml-2">Read meme detail page</label>
             </div>
             <div>
               <input
                 type="checkbox"
-                name="readoutComments"
-                id="readoutComments"
+                name="read_comments"
+                id="read_comments"
                 className='toggle'
+                checked={formData.read_comments}
+                onChange={handleInputChange}
               />
-              <label htmlFor="readoutComments" className="ml-2">Read comments</label>
+              <label htmlFor="read_comments" className="ml-2">Read comments</label>
             </div>
           </div>
+          <button type="submit" className="btn-primary btn mt-8">Save</button>
+          {errorMessage && <p className="text-error mt-2">{errorMessage}</p>}
         </SettingsSegment>
       </form>
     </BaseLayout>

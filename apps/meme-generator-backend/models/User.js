@@ -5,6 +5,9 @@ class User {
     this.password = password;
     this.resetToken = null;
     this.tokenExpiry = null;
+    this.read_feed = false;
+    this.read_details = false;
+    this.read_comments = false;
   }
 }
 
