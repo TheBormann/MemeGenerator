@@ -1,32 +1,34 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
-const useTextToSpeech = (json) => {
-    const [utterance, setUtterance] = useState(null);
+const useTextToSpeech = () => {
+    const [utterance, setUtterance] = useState(new SpeechSynthesisUtterance());
 
-    useEffect(() => {
-        // Create a new instance of SpeechSynthesisUtterance
-        const newUtterance = new SpeechSynthesisUtterance();
-        setUtterance(newUtterance);
-
-        return () => {
-            // Clean up
-            if (window.speechSynthesis.speaking) {
-                window.speechSynthesis.cancel();
-            }
-        };
-    }, []);
-
-    useEffect(() => {
-        if (json && utterance) {
-            // Convert JSON object to string
-            const text = JSON.stringify(json, null, 2);
-            
+    const speak = useCallback((text) => {
+        if (text && utterance && window.speechSynthesis) {
             utterance.text = text;
             window.speechSynthesis.speak(utterance);
         }
-    }, [json, utterance]);
+    }, [utterance]);
+
+    const cancel = useCallback(() => {
+        if (window.speechSynthesis && window.speechSynthesis.speaking) {
+            window.speechSynthesis.cancel();
+        }
+    }, []);
+
+    useEffect(() => {
+        utterance.voice = window.speechSynthesis.getVoices().find(voice => voice.lang === 'en-US'); // Example: selecting a voice
+        utterance.pitch = 1; // Normal pitch
+        utterance.rate = 1; // Normal rate
+
+        return () => {
+            cancel();
+        };
+    }, [cancel, utterance]);
 
     return {
+        speak,
+        cancel
     };
 };
 

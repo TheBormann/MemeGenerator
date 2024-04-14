@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import useTextToSpeech from "../editor/useTextToSpeech";
 import Skeleton from 'react-loading-skeleton'; 
+import SessionManager from "../../data/SessionManager";
 
 const MemeCard = ({ meme, handleUpvote }) => {
-
-  const [jsonData, setJsonData] = useState(null);
   const cardRef = useRef(null);
-  useTextToSpeech(jsonData);
+  const { speak, cancel } = useTextToSpeech();
 
   const handleRedirection = () => {
     window.location.href = `/Single-View/${meme.id}`;
@@ -15,19 +14,20 @@ const MemeCard = ({ meme, handleUpvote }) => {
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        // Loop over the entries
         entries.forEach(entry => {
-          // If the entry is intersecting and is in the center of the viewport
-          if (entry.isIntersecting) {
-            // Update your JSON data here based on your criteria
-            setJsonData({ title: meme.title, caption: meme.caption});
+          if (entry.isIntersecting && SessionManager.getSpeechSettings().read_feed) {
+            const newData = { title: meme.title, caption: meme.caption };
+            speak(JSON.stringify(newData));
+          } else {
+            // Deactivate speech
+            cancel();
           }
         });
       },
       {
-        root: null, // viewport
+        root: null, // observing in viewport
         rootMargin: '0px',
-        threshold: 0.5 // Adjust this value based on how much of the item should be visible before triggering
+        threshold: 0.5 // Trigger when 50% of the item is visible, adjust as needed
       }
     );
 
@@ -39,21 +39,18 @@ const MemeCard = ({ meme, handleUpvote }) => {
       if (cardRef.current) {
         observer.unobserve(cardRef.current);
       }
+      cancel();
     };
-  }, [meme]); // You can add more dependencies if your JSON data update logic requires them
-
+  }, [meme, speak, cancel]);
 
   if (!meme) {
-    return (
-      <div className="skeleton-loader">
-        <Skeleton width={200} height={200}/>
-      </div>
-    );
+    return <div className="skeleton-loader"><Skeleton width={200} height={200}/></div>;
   }
 
   return (
-      <div className="card lg:card-side bg-base-100 h-screen py-24">
+      <div className="card lg:card-side bg-base-100 h-screen pt-48 lg:pt-24">
         <div
+          ref={cardRef}
           className={`backdrop-blur-3xl lg:h-[85vh] h-[60vh] max-w-screen-lg w-full flex justify-center relative cursor-pointer my-auto`}
           onClick={handleRedirection}
         >

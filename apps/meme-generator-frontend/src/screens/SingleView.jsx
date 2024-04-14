@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import BaseLayout from '../components/layout/BaseLayout';
 import { useParams } from 'react-router-dom';
 import Skeleton from 'react-loading-skeleton';
@@ -6,6 +6,8 @@ import 'react-loading-skeleton/dist/skeleton.css';
 import Statistics from '../components/single-view/statistics.jsx';
 import useMeme from '../components/single-view/useMeme.jsx';
 import CommentsSection from '../components/single-view/CommentSection.jsx';
+import useTextToSpeech from '../components/editor/useTextToSpeech.jsx';
+import SessionManager from "../data/SessionManager";
 
 //TODO: extra get request for single meme with id needed
 
@@ -13,11 +15,36 @@ import CommentsSection from '../components/single-view/CommentSection.jsx';
 const SingleView = () => {
     const { id } = useParams();
     const { image, loading, handleUpvote, handleComment, handleNext, handlePrev } = useMeme(id);
+    const { speak, cancel } = useTextToSpeech();
+    const hasSpokenRef = useRef(false);
+
+    useEffect(() => {
+        console.log(hasSpokenRef.current);
+        if (!loading && image && !hasSpokenRef.current) {
+            const settings = SessionManager.getSpeechSettings();
+            let newData = {};
+
+            if (settings.read_details && settings.read_comments && image.comments.length > 0) {
+                newData = { title: image.title, caption: image.caption, comments: image.comments.map(comment => comment.comment).join('    ') };
+            } else if (settings.read_details) {
+                newData = { title: image.title, caption: image.caption };
+            }
+
+            if (Object.keys(newData).length !== 0) {
+                speak(JSON.stringify(newData));
+                hasSpokenRef.current = true; 
+            }
+        }
+
+        return () => {
+            cancel();
+        };
+    }, [image, loading, speak, cancel]);
 
     return (
-        <BaseLayout className='p-0 flex justify-center'>
+        <BaseLayout className='pt-32 flex justify-center'>
             <div className="mx-2 w-full min-h-screen  max-w-3xl flex flex-col align-middle justify-center md:px-12">
-                <div className="w-full flex justify-center">
+                <div className="w-full flex justify-center pb-12">
                     {loading ? (
                         <Skeleton />
                     ) : (
