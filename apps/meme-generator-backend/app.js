@@ -17,13 +17,11 @@ console.log(`Connected to MongoDB at port ${MONGODB_PORT}`);
 
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
-var exampleRouter = require("./routes/example");
 var memesRouter = require("./routes/memes");
 var templatesRouter = require("./routes/templates");
 var loginRouter = require("./routes/login");
 var signupRouter = require("./routes/signUp");
 var resetPasswordRouter = require("./routes/resetPassword");
-var validateTokenRouter = require("./routes/validateToken");
 var getUserDataRouter = require("./routes/getUserData");
 var updateUserDataRouter = require("./routes/updateUserData");
 var usermemesRouter = require("./routes/getUserMemes");
@@ -39,7 +37,7 @@ var options = {
     info: {
       title: "meme-generator-backend API",
       version: "1.0.0",
-      description: "Simple CRUD API application documented with Swagger",
+      description: "API for the meme generator backend",
     },
   },
   servers: ["http://localhost:3001"],
@@ -84,13 +82,11 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
-app.use("/example", exampleRouter);
 app.use("/memes", memesRouter);
 app.use("/templates", templatesRouter);
 app.use("/login", loginRouter);
 app.use("/signup", signupRouter);
 app.use("/reset-password", resetPasswordRouter);
-app.use("/validateToken", validateTokenRouter);
 app.use("/getUserData", getUserDataRouter);
 app.use("/updateUserData", updateUserDataRouter);
 app.use("/getUserMemes", usermemesRouter);
