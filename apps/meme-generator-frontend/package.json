@@ -18,6 +18,7 @@
     "chartjs-adapter-date-fns": "^3.0.0",
     "daisyui": "^4.3.1",
     "date-fns": "^3.3.1",
+    "fuzzyset": "^1.0.7",
     "html-to-image": "^1.11.11",
     "lucide-react": "^0.338.0",
     "react": "^18.2.0",

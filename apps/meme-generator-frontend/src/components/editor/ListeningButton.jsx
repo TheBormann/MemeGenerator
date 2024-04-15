@@ -3,13 +3,12 @@ import React, { useEffect } from 'react';
 const ListeningButton = ({ toggleListening, listening, transcript, browserSupportsSpeechRecognition }) => {
     // Commands list
     const commands = [
-        'insert "your text"',
-        'delete text "number"',
-        'change text "number" "text"',
+        'insert "text"',
+        'delete "number"',
+        'change "number" to "text"',
         'title "Title name"'
     ];
 
-    // useEffect hook to show/hide the modal based on the 'listening' state
     useEffect(() => {
         const modal = document.getElementById('speech_modal');
         if (listening) {
@@ -19,7 +18,6 @@ const ListeningButton = ({ toggleListening, listening, transcript, browserSuppor
         }
     }, [listening]);
 
-    // Function to handle modal close and stop listening
     const handleClose = () => {
         if (listening) {
             toggleListening();
@@ -27,9 +25,9 @@ const ListeningButton = ({ toggleListening, listening, transcript, browserSuppor
     };
 
     return (
-        <>
+        <div>
             <button 
-                className="btn listening-button" 
+                className="btn btn-secondary listening-button fixed bottom-4 right-4" 
                 onClick={toggleListening}
                 aria-label={listening ? 'Stop Listening' : 'Start Listening'}
                 type="button"
@@ -39,7 +37,7 @@ const ListeningButton = ({ toggleListening, listening, transcript, browserSuppor
             </button>
             <dialog id="speech_modal" className="modal" onClose={handleClose}>
                 <div className="modal-box">
-                    <h3 className="font-bold text-lg">Listening...</h3>
+                    <h3 className="font-bold text-lg mb-4">Listening...</h3>
                     <div className="flex flex-col w-full border-opacity-50">
                             <ul className="">
                                 {commands.map((command, index) => (
@@ -54,7 +52,7 @@ const ListeningButton = ({ toggleListening, listening, transcript, browserSuppor
                     </div>
                 </div>
             </dialog>
-        </>
+        </div>
     );
 };
 

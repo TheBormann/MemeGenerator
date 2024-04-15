@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+import FuzzySet from 'fuzzyset'
 
 export function useSpeech(addTextArea, updateTextArea, deleteTextArea, setName, textAreas) {
     const {
@@ -7,9 +8,12 @@ export function useSpeech(addTextArea, updateTextArea, deleteTextArea, setName, 
         listening,
         resetTranscript,
         browserSupportsSpeechRecognition
-    } = useSpeechRecognition( { continuous: true });
+    } = useSpeechRecognition({ continuous: true });
 
     const [wasListening, setWasListening] = useState(false);
+
+    const commandsFuzzySet = FuzzySet(['add', 'create', 'insert', 'delete', 'remove', 'update', 'change', 'alter', 'title']);
+    const actionFuzzySet = FuzzySet(['text']);
 
     const toggleListening = () => {
         if (browserSupportsSpeechRecognition) {
@@ -35,16 +39,19 @@ export function useSpeech(addTextArea, updateTextArea, deleteTextArea, setName, 
     useEffect(() => {
         if (wasListening && !listening && transcript) {
             const commands = transcript.split(' ');
-            const firstCommand = commands[0].toLowerCase();
+            const firstCommandGuess = commandsFuzzySet.get(commands[0].toLowerCase());
+            const firstCommand = firstCommandGuess ? firstCommandGuess[0][1] : null;
+            const actionCommandGuess = actionFuzzySet.get(commands[1]?.toLowerCase());
+            const actionCommand = actionCommandGuess ? actionCommandGuess[0][1] : null;
 
             console.log(commands);
 
-            if ((firstCommand === 'delete' || firstCommand === 'remove') && commands[1]?.toLowerCase() === 'text') {
+            if ((firstCommand === 'delete' || firstCommand === 'remove') && actionCommand === 'text') {
                 const index = writtenNumberToInt(commands[2]) - 1;
                 if (!isNaN(index) && index >= 0 && index < textAreas.length) {
                     deleteTextArea(index);
                 }
-            } else if ((firstCommand === 'update' || firstCommand === 'change' || firstCommand === 'alter') && commands[1]?.toLowerCase() === 'text') {
+            } else if ((firstCommand === 'update' || firstCommand === 'change' || firstCommand === 'alter') && actionCommand === 'text') {
                 const index = writtenNumberToInt(commands[2]) - 1;
                 if (!isNaN(index) && index >= 0 && index < textAreas.length) {
                     updateTextArea(index);
@@ -60,8 +67,7 @@ export function useSpeech(addTextArea, updateTextArea, deleteTextArea, setName, 
             resetTranscript();
         }
         setWasListening(listening);
-    }, [listening, transcript, resetTranscript, addTextArea, deleteTextArea, setName, textAreas]);
-
+    }, [listening, transcript, resetTranscript, addTextArea, deleteTextArea, setName, textAreas, wasListening, updateTextArea, commandsFuzzySet, actionFuzzySet]);
 
     return {
         toggleListening,

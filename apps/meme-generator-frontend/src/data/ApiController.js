@@ -169,6 +169,7 @@ const ApiController = {
   },
 
   async fetchAllTemplates(authors = ["public"]) {
+    //TODO implement keyword search
     try {
       let routeURL = `${API_BASE_URL}/templates`;
       if (authors.length) {
@@ -249,28 +250,6 @@ const ApiController = {
       return data;
     } catch (error) {
       throw error;
-    }
-  },
-
-  async validateToken() {
-    try {
-      const response = await fetch(`${API_BASE_URL}/validateToken`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${sessionStorage.getItem("authToken")}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Token validation failed");
-      }
-
-      const data = await response.json();
-      return data.isValid;
-    } catch (error) {
-      console.error("Error during token validation", error);
-      return false;
     }
   },
 
