@@ -1,14 +1,16 @@
 import React, { useState, useEffect, useRef } from "react";
+import { Link, useNavigate } from 'react-router-dom';
 import useTextToSpeech from "../editor/useTextToSpeech";
 import Skeleton from 'react-loading-skeleton'; 
 import SessionManager from "../../data/SessionManager";
 
 const MemeCard = ({ meme, handleUpvote }) => {
+  const navigate = useNavigate();
   const cardRef = useRef(null);
   const { speak, cancel } = useTextToSpeech();
 
   const handleRedirection = () => {
-    window.location.href = `/Single-View/${meme.id}`;
+    navigate(`/Single-View/${meme.id}`);
   };
 
   useEffect(() => {
@@ -49,10 +51,9 @@ const MemeCard = ({ meme, handleUpvote }) => {
 
   return (
       <div className="card lg:card-side bg-base-100 h-screen pt-48 lg:pt-24">
-        <div
+        <Link to={`/Single-View/${meme.id}`}
           ref={cardRef}
           className={`backdrop-blur-3xl lg:h-[85vh] h-[60vh] max-w-screen-lg w-full flex justify-center relative cursor-pointer my-auto`}
-          onClick={handleRedirection}
         >
           <img
             src={meme.url}
@@ -64,7 +65,7 @@ const MemeCard = ({ meme, handleUpvote }) => {
             alt={`${meme.title}`}
             className={`max-h-[75vh] m-4 object-scale-down  h-full absolute`}
           />
-        </div>
+        </Link>
         <div className="card-body max-w-xl mx-auto mb-auto lg:mt-auto w-full grid grid-rows-[auto-auto-1fr] lg:w-[35%]">
           <h2
             className="col-start-1 row-start-1 card-title items-start text-lg font-bold hover:underline underline-offset-2 cursor-pointer"

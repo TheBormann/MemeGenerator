@@ -1,12 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
 import BaseLayout from '../components/layout/BaseLayout';
 import MemeGallery from "../components/explore/MemeGallery.jsx";
-
-import useMeme from '../components/single-view/useMeme.jsx';
-import useTextToSpeech from "../components/editor/useTextToSpeech";
+import  { useMemeContext } from "../contexts/memeContext.jsx";
 
 const Home = () => {
-  const { loading, images, fetchNextPage, handleUpvote, error } = useMeme();
+  const { images, loading, error, fetchMemes, handleUpvote } = useMemeContext();
 
   const [sortedBy, setSortedBy] = useState("creationDateDesc");
   const [filter, setFilter] = useState({
@@ -15,11 +13,9 @@ const Home = () => {
     votes: 0,
     keyword: "",
   });
-  //TODO: fetch data with initial sorting and filter
 
   const onSortChange = (value) => {
     setSortedBy(value);
-    //TODO: fetch data with new sorting
   };
 
   const onFilterChange = (name, value) => {
@@ -48,9 +44,18 @@ const Home = () => {
     //TODO: fetch data with new filter
   };
 
+  useEffect(() => {
+    fetchMemes({ filters: filter, sorting: sortedBy});
+  }, [filter, sortedBy]);
+
+  const onFetchMemes = () => {
+    console.log("fetching memes")
+    fetchMemes({ filters: filter, sorting: sortedBy, append: true});
+  }
+
   return (
     <BaseLayout showFooter={false} className='p-0'>
-      <MemeGallery images={images} showFilter={true} loading={loading} error={error} handleUpvote={handleUpvote}  />
+        <MemeGallery images={images} showFilter={true} loading={loading} error={error} fetchMemes={onFetchMemes} handleUpvote={handleUpvote} onFilterChange={onFilterChange} onSortChange={onSortChange} />
     </BaseLayout>
   );
 };

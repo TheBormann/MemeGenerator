@@ -1,80 +1,50 @@
-import { useState, useRef } from 'react';
-import UploadFile from "./UploadFile";
-import ImageURLUpload from "./ImageURLUpload";
-import CameraImage from "./CameraImage";
-import HandDrawnImage from "./HandDrawnImage";
+import { useState } from 'react';
 import ApiController from '../../data/ApiController';
+import { useNavigate } from 'react-router-dom'; 
 
-export const useFileUpload = (handleUploaded) => {
-    const [selectedMethod, setSelectedMethod] = useState();
-    const [currentDisplayedPicture, setCurrentDisplayedPicture] = useState(null);
-    const [uploadedFiles, setUploadedFiles] = useState({
-        file: null,
-        urlImage: null,
-        camera: null,
-        screenshot: null,
-        gif: null,
-    });
+export const useFileUpload = () => {
+    const [template, setTemplate] = useState(null);
+    const [file, setFile] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
 
-    // Generic function to update state based on type
-    const updateUploadedFiles = (type, file, pictureUrl = null) => {
-        setUploadedFiles(prev => ({ ...prev, [type]: file }));
-        if (pictureUrl) setCurrentDisplayedPicture(pictureUrl);
+    const handleFileChange = async (event) => {
+        setLoading(true);
+        const uploadedFile = event.target.files[0];
+        if (!uploadedFile || !['image/jpeg', 'image/png', 'image/gif'].includes(uploadedFile.type)) {
+            setLoading(false);
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            setFile(uploadedFile); // This stores the image data URL
+            await saveDataIntoDatabase(uploadedFile);
+            setLoading(false);
+            handleUploaded();
+        };
+        reader.readAsDataURL(uploadedFile);
     };
 
-    const handleFileChange = (type) => async (event) => {
-        switch (type) {
-            case 'file':
-                const file = event.target.files[0];
-                UploadFile.handleFileUpload(event, (url) => updateUploadedFiles('file', file, url));
-                break;
-            case 'urlImage':
-                ImageURLUpload.handleImageURLUpload(event, (url) => updateUploadedFiles('urlImage', event.target.value, url));
-                break;
-            case 'camera':
-                await CameraImage.handleCameraImage((file, url) => updateUploadedFiles('camera', file, url));
-                break;
-            case 'screenshot':
-                // Handle screenshot upload logic here
-                break;
-            case 'gif':
-                // Handle GIF upload logic here
-                break;
-            default:
-                console.error('Unsupported file type');
+    const saveDataIntoDatabase = async (fileData) => {
+        try {
+            const response = await ApiController.saveNewImage(fileData);
+            console.log('File saved successfully');
+            setTemplate(response['template']);
+        } catch (error) {
+            console.error('Error saving file:', error);
         }
     };
 
-    const saveDataIntoDatabase = async () => {
-        const fileToSave = Object.values(uploadedFiles).find(file => file !== null);
-        if (fileToSave) {
-            try {
-                await ApiController.saveNewImage(fileToSave);
-                console.log('File saved successfully');
-                setCurrentDisplayedPicture(null);
-                // Clear state
-                setUploadedFiles({
-                    file: null,
-                    urlImage: null,
-                    camera: null,
-                    screenshot: null,
-                    gif: null,
-                    video: null,
-                });
-            } catch (error) {
-                console.error('Error saving file:', error);
-            }
-        } else {
-            console.log('No file to save');
-        }
-    };
+    const handleUploaded = () => {
+        console.log(template)
+        navigate('/create-meme', { state: { selectedTemplate: template } });
+    }
 
     return {
-        selectedMethod,
-        setSelectedMethod,
-        currentDisplayedPicture,
-        uploadedFiles,
+        template,
+        file,
         handleFileChange,
-        saveDataIntoDatabase,
+        loading
     };
 };

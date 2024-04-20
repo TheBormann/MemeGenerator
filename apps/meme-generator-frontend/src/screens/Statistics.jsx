@@ -13,7 +13,7 @@ const Statistics = () => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const response = await ApiController.fetchAllMemes();
+        const response = await ApiController.fetchAllMemes({});
         const memes = response.results;
 
         if (memes.length === 0) {
@@ -65,11 +65,10 @@ const Statistics = () => {
         ) : uploadData && uploadData.length > 0 ? (
           <XYPlot
               xType="ordinal"
-              width={800}
+              width={600}
               height={400}
               xDistance={50}
               margin={{ bottom: 70, left: 70, right: 70, top: 50 }}
-              style={{  }}
           >
             <VerticalGridLines />
             <HorizontalGridLines />

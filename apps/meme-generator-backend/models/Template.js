@@ -1,3 +1,4 @@
+
 class Template {
     constructor(name, author, isPublic, imagePath) {
         this.name = name;

@@ -1,13 +1,29 @@
 const SessionManager = {
   getUserName() {
-    return JSON.parse(sessionStorage.getItem("userData")).username;
+    const userData = sessionStorage.getItem("userData");
+    if (!userData) {
+      return "No data";
+    }
+    return JSON.parse(userData).username;
   },
   getEmail() {
-    return JSON.parse(sessionStorage.getItem("userData")).email;
+    const userData = sessionStorage.getItem("userData");
+    if (!userData) {
+      return "No data";
+    }
+    return JSON.parse(userData).email;
   },
   getSpeechSettings() {
-    const json = JSON.parse(sessionStorage.getItem("userData"));
-    return {"read_feed": json.read_feed, "read_details": json.read_details, "read_comments": json.read_comments};
+    const userData = sessionStorage.getItem("userData");
+    if (!userData) {
+      return "No data";
+    }
+    const json = JSON.parse(userData);
+    return {
+      read_feed: json.read_feed,
+      read_details: json.read_details,
+      read_comments: json.read_comments
+    };
   },
 };
 

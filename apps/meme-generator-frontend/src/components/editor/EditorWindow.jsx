@@ -216,7 +216,7 @@ function EditorWindow({
           <input
             type="text"
             placeholder="Meme name"
-            className="input input-bordered w-full mb-12 max-w-xl mx-auto"
+            className="input input-bordered w-full mb-6 max-w-xl mx-auto"
             value={name}
             onChange={(event) => handleMemeNameChange(event)}
           />
@@ -256,7 +256,7 @@ function EditorWindow({
         <input
           type="text"
           placeholder="Meme Description"
-          className="input input-bordered w-full mt-8 max-w-xl mx-auto"
+          className="input input-bordered w-full mt-4 max-w-xl mx-auto"
           value={description}
           onChange={(event) => handleMemeDescriptionChange(event)}
         />
@@ -294,7 +294,7 @@ function EditorWindow({
               />
             ))}
           </div>
-          <div className="flex flex-col items-center md:items-end gap-2">
+          <div className="flex flex-col items-center lg:items-end gap-2">
             <div className="flex gap-1">
               <div className="flex">
                 {isFileSizeLimited ? (
@@ -304,6 +304,7 @@ function EditorWindow({
                       min="10"
                       value={fileSizeLimit}
                       onChange={(event) => setFileSizeLimit(event.target.value)}
+                      className="input input-bordered w-full max-w-xs"
                     />
                   </div>
                 ) : (

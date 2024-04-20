@@ -8,12 +8,14 @@ import Settings from "../screens/Settings";
 import CreateMemePage from "../screens/CreateMeme";
 import History from "../screens/History";
 import React from "react";
-import AddMethodEditor from "../screens/AddMethodEditor.jsx";
 import AuthenticatedWrapper from './AuthenticatedWrapper.jsx';
 import SingleView from "../screens/SingleView.jsx";
 import SetNewPassword from "../screens/SetNewPassword.jsx";
 import Statistics from "../screens/Statistics.jsx";
 import SelectTemplate from "../screens/SelectTemplate.jsx";
+import UploadTemplate from "../screens/UploadTemplate.jsx";
+import { MemeProvider } from '../contexts/memeContext.jsx';
+
 
 export const router = createBrowserRouter([
   {
@@ -73,19 +75,19 @@ export const router = createBrowserRouter([
     errorElement: <Error />,
   },
   {
-    path: "/create-meme",
+    path: "/upload-template",
     element: (
       <AuthenticatedWrapper>
-        <CreateMemePage />
+        <UploadTemplate />
       </AuthenticatedWrapper>
     ),
     errorElement: <Error />,
   },
   {
-    path: "/add-template",
+    path: "/create-meme",
     element: (
       <AuthenticatedWrapper>
-        <AddMethodEditor />
+        <CreateMemePage />
       </AuthenticatedWrapper>
     ),
     errorElement: <Error />,

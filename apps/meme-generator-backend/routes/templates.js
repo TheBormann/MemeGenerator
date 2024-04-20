@@ -52,24 +52,24 @@ const validateID = (req, res, next) => {
  */
 router.get("/", async (req, res) => {
   console.log(req.query);
-  const { authors = "undefined" } = req.query;
+  let { authors, public=true } = req.query;
+  let query = {};
 
-  let query = {
-    author: { $in: authors },
-  };
+  query['isPublic'] = public;
 
-  // adapt query, if only a single value is provided
   if (typeof authors === "string") {
-    query = {
-      author: authors,
-    };
+    query['author'] = authors;
+  } else if (Array.isArray(authors)) {
+    query['author'] = { $in: authors };
   }
 
   const db = req.db;
   var templates = db.get("templates");
+
   try {
     const allTemplates = await templates.find(query);
-    res.json(allTemplates);
+    console.log(allTemplates); // Output the result to console for verification
+    res.json({ templates: allTemplates });
   } catch (error) {
     res.status(500).json({ error: "Internal server error" });
   }
@@ -183,10 +183,9 @@ router.post("/upload", upload.single("image"), async (req, res) => {
       .replace(/\\/g, "/")
       .replace("public/", "");
     const newTemplate = new Template(name, author, isPublic, updatedPath);
-    console.log(newTemplate);
-    templates.insert(newTemplate);
+    const savedTemplate = await templates.insert(newTemplate);
 
-    res.status(201).json({ message: "Template created successfully" });
+    res.status(201).json({ template: savedTemplate, message: "Template created successfully" });
   } catch (error) {
     console.error("Error creating template:", error);
     res.status(500).json({ error: "Internal server error" });
