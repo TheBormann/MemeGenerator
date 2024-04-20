@@ -2,7 +2,7 @@ function GeneratedMemeDialog({ isOpen, name, generatedImage, memeRef, downloadIm
     if (!isOpen) return null;
   
     return (
-      <dialog id="generated_meme_modal" className="modal" open={isOpen}>
+      <dialog id="generated_meme_modal" className="modal modal-bottom sm:modal-middle" open={isOpen}>
         <div className="modal-box">
           <h2 className="font-bold text-2xl mb-3">New Meme: {name}</h2>
           {generatedImage == null ? (
@@ -16,10 +16,10 @@ function GeneratedMemeDialog({ isOpen, name, generatedImage, memeRef, downloadIm
           <div className="modal-action">
             <div className="flex flex-col items-end gap-2">
               <div className="flex justify-between">
-                <button type="button" className="btn mx-2" onClick={downloadImage} disabled={generatedImage == null}>
+                <button type="button" className="btn btn-outline mx-2" onClick={downloadImage} disabled={generatedImage == null}>
                   Download
                 </button>
-                <button type="button" className="btn btn-accent" onClick={shareMeme} disabled={generatedImage == null || uploadedLink != null}>
+                <button type="button" className="btn btn-primary" onClick={shareMeme} disabled={generatedImage == null || uploadedLink != null}>
                   Share
                 </button>
               </div>

@@ -222,7 +222,7 @@ function EditorWindow({
           />
           <div className="meme-editor-container flex justify-center h-full relative group/imgContainer px-3">
             {template ? (
-              <div className="my-auto max-[500px]">
+              <div className="my-auto">
                 <div
                   className=" relative"
                   id="editing-container"
@@ -232,7 +232,7 @@ function EditorWindow({
                     crossOrigin="anonymous"
                     src={template.url}
                     alt="DraftImage"
-                    className="w-[500px] object-scale-down h-full"
+                    className="object-scale-down h-full"
                   />
                   {textAreas.map((textArea, index) => (
                     <TextBox
@@ -296,7 +296,18 @@ function EditorWindow({
           </div>
           <div className="flex flex-col items-center lg:items-end gap-2">
             <div className="flex gap-1">
-              <div className="flex">
+              <div className="flex gap-4 align-middle">
+                <div className="form-control">
+                  <label className="cursor-pointer label">
+                    <span className="label-text pr-2">Limit file size? (KB)</span>
+                    <input
+                      type="checkbox"
+                      checked={isFileSizeLimited}
+                      className="checkbox checkbox-info"
+                      onChange={() => setIsFileSizeLimited(!isFileSizeLimited)}
+                    />
+                  </label>
+                </div>
                 {isFileSizeLimited ? (
                   <div>
                     <input
@@ -310,75 +321,66 @@ function EditorWindow({
                 ) : (
                   <></>
                 )}
-                <div className="form-control">
-                  <label className="cursor-pointer label">
-                    <span className="label-text pr-2">Limit file size? (KB)</span>
-                    <input
-                      type="checkbox"
-                      checked={isFileSizeLimited}
-                      className="checkbox checkbox-info"
-                      onChange={() => setIsFileSizeLimited(!isFileSizeLimited)}
-                    />
-                  </label>
-                </div>
               </div>
-              <button
-                className="btn btn-outline btn-error w-fit"
-                disabled={!textAreas.length}
-                onClick={() => document.getElementById("my_modal_1").showModal()}
-              >
-                Clear
-              </button>
-              <dialog id="my_modal_1" className="modal">
-                <div className="modal-box">
-                  <h3 className="font-bold text-lg">Delete Editing</h3>
-                  <p className="py-4">
-                    Are you sure that you want to clear your editing progress?
-                  </p>
-                  <div className="modal-action">
-                    <form method="dialog">
-                      <button
-                        className="btn btn-outline btn-error w-fit mr-2"
-                        onClick={clear}
-                      >
-                        Clear
-                      </button>
-                      <button className="btn">Cancel</button>
-                    </form>
-                  </div>
-                </div>
-              </dialog>
-              <button
-                className="btn btn-primary"
-                disabled={!name}
-                onClick={onGenerateMeme}
-              >
-                Generate Meme
-              </button>
-                <GeneratedMemeDialog
-                isOpen={showModal}
-                name={name}
-                generatedImage={generatedImage}
-                memeRef={memeRef}
-                downloadImage={downloadImage}
-                shareMeme={shareMeme}
-                uploadedLink={uploadedLink}
-                clear={() => {
-                  clear();
-                  setShowModal(false);
-                }}
-              />
             </div>
           </div>
         </div>
-        <ListeningButton
-              toggleListening={toggleListening}
-              listening={listening}
-              transcript={transcript}
-              browserSupportsSpeechRecognition={
-                browserSupportsSpeechRecognition
-              }
-        />
+        <div className=" fixed bottom-0 left-0 right-0 justify-center mx-auto m-4 flex gap-4">
+          <button
+            className="btn btn-outline btn-error w-fit"
+            disabled={!textAreas.length}
+            onClick={() => document.getElementById("delete_modal").showModal()}
+          >
+            Clear
+          </button>
+          <dialog id="delete_modal" className="modal modal-bottom sm:modal-middle">
+            <div className="modal-box">
+              <h3 className="font-bold text-lg">Delete Editing</h3>
+              <p className="py-4">
+                Are you sure that you want to clear your editing progress?
+              </p>
+              <div className="modal-action">
+                <form method="dialog">
+                  <button
+                    className="btn btn-outline btn-error w-fit mr-2"
+                    onClick={clear}
+                  >
+                    Clear
+                  </button>
+                  <button className="btn">Cancel</button>
+                </form>
+              </div>
+            </div>
+          </dialog>
+          <button
+            className="btn btn-primary"
+            disabled={!name}
+            onClick={onGenerateMeme}
+          >
+            Generate Meme
+          </button>
+          <GeneratedMemeDialog
+            isOpen={showModal}
+            name={name}
+            generatedImage={generatedImage}
+            memeRef={memeRef}
+            downloadImage={downloadImage}
+            shareMeme={shareMeme}
+            uploadedLink={uploadedLink}
+            clear={() => {
+              clear();
+              setShowModal(false);
+            }}
+          />
+          <ListeningButton
+            toggleListening={toggleListening}
+            listening={listening}
+            transcript={transcript}
+            browserSupportsSpeechRecognition={
+              browserSupportsSpeechRecognition
+            }
+          />
+        </div>
     </div>
   );
 }

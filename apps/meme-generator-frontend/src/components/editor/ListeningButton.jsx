@@ -27,7 +27,7 @@ const ListeningButton = ({ toggleListening, listening, transcript, browserSuppor
     return (
         <div>
             <button 
-                className="btn btn-secondary listening-button fixed bottom-4 right-4" 
+                className="btn btn-outline listening-button" 
                 onClick={toggleListening}
                 aria-label={listening ? 'Stop Listening' : 'Start Listening'}
                 type="button"

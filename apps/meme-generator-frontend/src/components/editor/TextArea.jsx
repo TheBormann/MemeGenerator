@@ -17,7 +17,7 @@ function TextArea({
 }) {
   return (
     <div
-    className="flex flex-col space-x-2 mb-2 bg-gray-light rounded-lg p-1"
+    className="flex flex-col space-x-2 mb-2 rounded-lg p-2"
     key={index}
     >
     <label className="lael-text text-xs px-2">
@@ -25,7 +25,7 @@ function TextArea({
     </label>
     <div className="flex items-center gap-1">
         <textarea
-        className="textarea rounded-sm w-full"
+        className="textarea textarea-bordered rounded-2xl w-full"
         value={textArea.text}
         onChange={(event) => handleTextChange(event, index)}
         placeholder="Enter text here"
@@ -57,7 +57,7 @@ function TextArea({
         </div>
         <div
             tabIndex={0}
-            className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+            className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box"
         >
             <label className="label">
             <span className="label-text pr-2">Font: </span>
