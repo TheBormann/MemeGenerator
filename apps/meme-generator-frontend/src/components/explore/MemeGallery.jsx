@@ -2,10 +2,12 @@ import React, {useEffect, useState}  from 'react';
 import { throttle } from 'lodash';
 import MemeFilter from "./MemeFilter";
 import MemeCard from "./MemeCard";
+import { useMemeContext } from '../../contexts/memeContext';
 
-const MemeGallery = ({ images, title, showFilter=true, onFilterChange, onSortChange, loading, error, fetchMemes, handleUpvote }) => {
+const MemeGallery = ({ title, showFilter=true }) => {
     const [showFab, setShowFab] = useState(false);
     const contentRef = React.useRef(null);
+    const { images, fetchMemes, loading, error, handleUpvote} = useMemeContext();
 
     useEffect(() => {
       const handleScroll = throttle(() => {
@@ -13,7 +15,8 @@ const MemeGallery = ({ images, title, showFilter=true, onFilterChange, onSortCha
         if (content) {
           const isBottom = content.scrollHeight - content.scrollTop <= (content.clientHeight + 10);
           if (isBottom && !loading) {
-            fetchMemes();
+            console.log("Fetching more memes");
+            fetchMemes({ append: true});
           }
     
           if (content.scrollTop > 200) {
@@ -58,8 +61,6 @@ const MemeGallery = ({ images, title, showFilter=true, onFilterChange, onSortCha
     return (
         <div className='h-screen w-screen flex flex-col justify-center align-middle'>
             <MemeFilter
-                onFilterChange={onFilterChange}
-                onSortChange={onSortChange}
                 visible={showFilter && !showFab}
                 className="fixed"
             />
@@ -72,7 +73,6 @@ const MemeGallery = ({ images, title, showFilter=true, onFilterChange, onSortCha
   return (
     <>
       <MemeFilter
-        onFilterChange={onFilterChange}
         visible={showFilter && !showFab}
         className="fixed"
       />

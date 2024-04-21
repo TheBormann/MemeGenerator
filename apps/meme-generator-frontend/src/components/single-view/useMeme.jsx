@@ -38,44 +38,36 @@ const useMeme = () => {
         comments: img.comments || [],
     });
 
-    const fetchMemes = async ({ filters, sorting, append = false }) => {
+    const fetchMemes = useCallback(async ({ filters = lastParams.filters, sorting = lastParams.sorting, append = false }) => {
         setLoading(true);
-
-        if (JSON.stringify(filters) !==
-            JSON.stringify(lastParams.filters) ||
-            JSON.stringify(sorting) !==
-            JSON.stringify(lastParams.sorting) ||
-            !append
-        ) {
+        setError(null);
+    
+        // If we are not appending, reset the page index and other related state.
+        if (!append) {
             setPageIndex(0);
             setMemeIndex(0);
-            setLastParams({ filters: filters, sorting: sorting });
-            setImages([])
+            setLastParams({ filters, sorting });
+            setImages([]);
         }
-
-        if(images.length !== 0 && images.length % ApiController.PAGE_LIMIT !== 0) {
-            setLoading(false);
-            return;
-        }
-        
+    
         try {
             const { results } = await ApiController.fetchAllMemes({
-                page: pageIndex,
+                page: append ? pageIndex + 1 : pageIndex, // Use the next page if appending, otherwise use the current page.
                 filter: filters,
                 sortedBy: sorting,
             });
-            setImages(append
-            ? [...images, ...results.map(formatMeme)]
-            : results.map(formatMeme));
-
-            setPageIndex(pageIndex + 1)
-            setMemeIndex(0)
+            setImages(prev => append ? [...prev, ...results.map(formatMeme)] : results.map(formatMeme));
+            if (append && results.length > 0) {
+                setPageIndex(prev => prev + 1); // Only increment the page index if appending and results are returned.
+            }
         } catch (error) {
             setError('Failed to fetch new memes');
         } finally {
             setLoading(false);
         }
-    };
+    }, [lastParams.filters, lastParams.sorting, pageIndex]);
+    
+
 
     const fetchMemeById = async (id) => {
         setLoading(true);
@@ -154,7 +146,7 @@ const useMeme = () => {
     const handleNext = () => handleNextPrevCommon(1);
     const handlePrev = () => handleNextPrevCommon(-1);
 
-    return { image, images, loading, error, setImage, setImages, setPageIndex, fetchMemes, fetchMemeById, handleUpvote, handleComment, handleNext, handlePrev };
+    return { image, images, loading, error, setImage, setImages, setPageIndex, fetchMemes, fetchMemeById, lastParams, handleUpvote, handleComment, handleNext, handlePrev };
 };
 
 export default useMeme;

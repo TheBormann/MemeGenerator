@@ -1,17 +1,30 @@
 import React, {useState, useEffect} from "react";
+import { useMemeContext } from "../../contexts/memeContext";
 
-const MemeFilter = ({ onFilterChange, onSortChange, visible }) => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [sortValue, setSortValue] = useState("");
-  const [creationDateBefore, setCreationDateBefore] = useState(new Date().toISOString().split('T')[0]);
+const MemeFilter = ({ visible }) => {
+  const { fetchMemes, lastParams } = useMemeContext();
+  const [searchTerm, setSearchTerm] = useState(lastParams.filters?.keyword || "");
+  const [sortValue, setSortValue] = useState(lastParams.sorting || "");
+  const [creationDateBefore, setCreationDateBefore] = useState(lastParams.filters?.creationDateBefore || new Date().toISOString().split('T')[0]);
 
-  // Update local state instead of filtering immediately
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    if (name === "searchTerm") {
-      setSearchTerm(value);
-    } else if (name === "creationDateBefore") {
-      setCreationDateBefore(value);
+
+  // Logs state changes for debugging purposes
+  useEffect(() => {
+    console.log(`Search Term: ${searchTerm}, Sort: ${sortValue}, Date Before: ${creationDateBefore}`);
+  }, [searchTerm, sortValue, creationDateBefore]);
+
+  // Handle changes for all inputs using a generic handler
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    switch (name) {
+      case "searchTerm":
+        setSearchTerm(value);
+        break;
+      case "creationDateBefore":
+        setCreationDateBefore(value);
+        break;
+      default:
+        break;
     }
   };
 
@@ -21,10 +34,8 @@ const MemeFilter = ({ onFilterChange, onSortChange, visible }) => {
   };
 
   // Handle search button click
-  const handleSearch = () => {
-    onFilterChange('searchTerm', searchTerm);
-    onFilterChange('creationDateBefore', creationDateBefore);
-    onSortChange(sortValue);
+  const handleSearch = (event) => {
+    fetchMemes({ filters: { keyword: searchTerm, creationDateBefore: creationDateBefore}, sorting: sortValue, append: false });
   };
 
 
@@ -64,12 +75,6 @@ const MemeFilter = ({ onFilterChange, onSortChange, visible }) => {
         </div>
       </div>
   );
-};
-
-MemeFilter.defaultProps = {
-  onFilterChange: () => {},
-  onSortChange: () => {},
-  visible: true
 };
 
 export default MemeFilter;
