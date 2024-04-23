@@ -7,7 +7,6 @@ const verifyAuthor = require("../middleware/verifyAuthor");
 const fs = require("fs");
 const sharp = require("sharp"); //for resizing
 
-
 //const imageZipper = require("../tools/imageZipper");
 
 async function resizeImage(buffer, targetSize) {
@@ -304,16 +303,17 @@ router.post("/upload", upload.single("image"), async (req, res) => {
       memeData.templateId
     );
 
-
     const db = req.db;
     const memes = db.get("memes");
 
     const createdMeme = await memes.insert(newMeme);
-    const shareableURL = `${process.env.BACKEND_DOMAIN}/${createdMeme._id}`; 
+    const shareableURL = `${process.env.BACKEND_DOMAIN}/${createdMeme._id}`;
 
-    res
-      .status(201)
-      .json({ message: "Meme created successfully", meme: createdMeme, imageURL: shareableURL });
+    res.status(201).json({
+      message: "Meme created successfully",
+      meme: createdMeme,
+      imageURL: shareableURL,
+    });
   } catch (error) {
     console.error("Error creating meme:", error);
     res.status(500).json({ error: "Internal server error" });
@@ -385,23 +385,129 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-router.post('/:id', upload.single('image'), verifyAuthor, async (req, res) => {
+/**
+ * @swagger
+ * /memes/{id}:
+ *  post:
+ *    summary: Update a meme
+ *    description: Updates a meme's details by its ID
+ *    tags:
+ *      - Memes
+ *    parameters:
+ *      - in: path
+ *        name: id
+ *        required: true
+ *        schema:
+ *          type: string
+ *        description: Unique identifier of the meme
+ *      - in: formData
+ *        name: title
+ *        type: string
+ *        required: true
+ *        description: New title of the meme
+ *      - in: formData
+ *        name: description
+ *        type: string
+ *        description: New description of the meme
+ *      - in: formData
+ *        name: textFields
+ *        type: array
+ *        items:
+ *          type: string
+ *        description: Additional text fields related to the meme
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        multipart/form-data:
+ *          schema:
+ *            type: object
+ *            properties:
+ *              image:
+ *                type: string
+ *                format: binary
+ *                description: Updated image file for the meme
+ *    responses:
+ *      '200':
+ *        description: Successfully updated meme
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                _id:
+ *                  type: string
+ *                  description: Unique ID of the meme
+ *                title:
+ *                  type: string
+ *                  description: Title of the meme
+ *                description:
+ *                  type: string
+ *                  description: Description of the meme
+ *                imageUrl:
+ *                  type: string
+ *                  description: URL to the updated image of the meme
+ *      '404':
+ *        description: Meme not found
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                error:
+ *                  type: string
+ *                  description: Error message indicating the meme was not found
+ *      '500':
+ *        description: Internal server error
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                error:
+ *                  type: string
+ *                  description: Error message indicating internal server error
+ */
+router.post("/:id", upload.single("image"), verifyAuthor, async (req, res) => {
   const memeId = req.params.id;
-  const { title, description, textFields } = req.body; // Example fields that might be updated
 
   try {
-    const updatedMeme = await Meme.findByIdAndUpdate(memeId, { title, description, textFields }, { new: true });
-    if (!updatedMeme) {
-      return res.status(404).send('Meme not found.');
+    const meme = await Meme.findById(memeId);
+    if (!meme) {
+      return res.status(404).send("Meme not found.");
     }
 
-    res.json(updatedMeme);
+    // Delete the old image if it exists
+    const oldImagePath = `./public/data/uploads/${meme.imageURL}`;
+    if (fs.existsSync(oldImagePath)) {
+      fs.unlinkSync(oldImagePath);
+    }
+
+    // Process the new image
+    const newImagePath = req.file.path
+      .replace(/\\/g, "/")
+      .replace("public/", "");
+
+    // Update meme with new details
+    const updatedMeme = await Meme.findByIdAndUpdate(
+      memeId,
+      {
+        title: req.body.title,
+        description: req.body.description,
+        textFields: req.body.textAreas,
+        imageURL: newImagePath, // Save new image path
+      },
+      { new: true }
+    );
+
+    const shareableURL = `${process.env.BACKEND_DOMAIN}/memes/${updatedMeme._id}`;
+    updatedMeme.imageURL = shareableURL;
+
+    res.json({ message: "Meme updated successfully", meme: updatedMeme });
   } catch (error) {
-    console.error('Error updating meme:', error);
-    res.status(500).send('Internal server error.');
+    console.error("Error updating meme:", error);
+    res.status(500).send("Internal server error.");
   }
 });
-
 
 /**
  * @swagger

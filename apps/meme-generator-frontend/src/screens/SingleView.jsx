@@ -20,7 +20,6 @@ const SingleView = () => {
       }, [id]);
 
     useEffect(() => {
-        console.log(hasSpokenRef.current);
         if (!loading && image && !hasSpokenRef.current) {
             const settings = SessionManager.getSpeechSettings();
             let newData = {};
@@ -51,7 +50,6 @@ const SingleView = () => {
                     ) : (
                         <img src={image.url} alt={`Meme ${image.id}`} className="flex object-contain max-h-[70vh] justify-center" />
                     )}
-                    {console.log(image.url)}
                 </div>
                 {loading ? (
                     <Skeleton count={5} />

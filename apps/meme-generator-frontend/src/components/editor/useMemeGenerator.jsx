@@ -54,6 +54,7 @@ const useMemeGenerator = ({ template, textAreas, imageContainerRef, name, descri
       const formData = new FormData();
       formData.append("title", name);
       formData.append("description", description);
+      formData.append("textAreas", JSON.stringify(textAreas));
       formData.append("image", blob, `${name}.png`);
 
       try {

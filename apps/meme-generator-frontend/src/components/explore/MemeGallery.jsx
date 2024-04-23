@@ -1,46 +1,51 @@
-import React, {useEffect, useState}  from 'react';
+import React, { useEffect, useState, useRef, useLayoutEffect } from 'react';
 import { throttle } from 'lodash';
 import MemeFilter from "./MemeFilter";
 import MemeCard from "./MemeCard";
 import { useMemeContext } from '../../contexts/memeContext';
 
-const MemeGallery = ({ title, showFilter=true }) => {
-    const [showFab, setShowFab] = useState(false);
-    const contentRef = React.useRef(null);
-    const { images, fetchMemes, loading, error, handleUpvote} = useMemeContext();
+const MemeGallery = ({ title, showFilter = true }) => {
+  const [showFab, setShowFab] = useState(false);
+  const contentRef = useRef(null);
+  const { images, fetchMemes, loading, error, handleUpvote } = useMemeContext();
+  const [savedScrollPosition, setSavedScrollPosition] = useState(0);
 
-    useEffect(() => {
-      const handleScroll = throttle(() => {
-        const content = contentRef.current;
-        if (content) {
-          const isBottom = content.scrollHeight - content.scrollTop <= (content.clientHeight + 10);
-          if (isBottom && !loading) {
-            console.log("Fetching more memes");
-            fetchMemes({ append: true});
-          }
-    
-          if (content.scrollTop > 200) {
-            setShowFab(true);
-          } else {
-            setShowFab(false);
-          }
-        }
-      }, 200); // Adjust the 200 ms to your liking
-    
-      const content = contentRef.current;
-      if (content) {
-        content.addEventListener("scroll", handleScroll);
-        return () => {
-          handleScroll.cancel();
-          content.removeEventListener("scroll", handleScroll);
-        };
+  const handleScroll = throttle(() => {
+    const content = contentRef.current;
+    if (content) {
+      const isBottom = content.scrollHeight - content.scrollTop <= (content.clientHeight + 10);
+      if (isBottom && !loading) {
+        console.log("Fetching more memes");
+        setSavedScrollPosition(content.scrollTop - (content.clientHeight / 2));
+        fetchMemes({ append: true });
       }
-    }, [loading, fetchMemes]);
-    const scrollToTop = () => {
-        if (contentRef.current) {
-          contentRef.current.scrollTo({ top: 0, behavior: "smooth" });
-        }
-    };
+
+      setShowFab(content.scrollTop > 200);
+    }
+  }, 200);
+
+  useEffect(() => {
+    const content = contentRef.current;
+    if (content) {
+      content.addEventListener("scroll", handleScroll);
+      return () => {
+        handleScroll.cancel();
+        content.removeEventListener("scroll", handleScroll);
+      };
+    }
+  }, [handleScroll]);
+
+  useLayoutEffect(() => {
+    if (contentRef.current && savedScrollPosition !== 0) {
+      contentRef.current.scrollTop = savedScrollPosition;  // Restore scroll position after DOM updates
+    }
+  }, [images]);  // This effect depends on the images array
+
+  const scrollToTop = () => {
+    if (contentRef.current) {
+      contentRef.current.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
 
   // Early return for error state
   if (error) {
@@ -59,14 +64,14 @@ const MemeGallery = ({ title, showFilter=true }) => {
   // Handling no images found
   if (images.length === 0) {
     return (
-        <div className='h-screen w-screen flex flex-col justify-center align-middle'>
-            <MemeFilter
-                visible={showFilter && !showFab}
-                className="fixed"
-            />
-            <h1 className="text-5xl font-bold text-center mb-8">{title}</h1>
-            <div className="text-center">No memes found.</div>
-        </div>
+      <div className='h-screen w-screen flex flex-col justify-center align-middle'>
+        <MemeFilter
+          visible={showFilter && !showFab}
+          className="fixed"
+        />
+        <h1 className="text-5xl font-bold text-center mb-8">{title}</h1>
+        <div className="text-center">No memes found.</div>
+      </div>
     );
   }
 
@@ -83,6 +88,9 @@ const MemeGallery = ({ title, showFilter=true }) => {
             <MemeCard meme={meme} handleUpvote={handleUpvote}/>
           </div>
         ))}
+        <div className="flex justify-center align-middle h-screen w-screen">
+          <span className="loading loading-ring loading-lg mx-auto my-24"></span>
+        </div>
       </div>
       {showFab && (
         <button
