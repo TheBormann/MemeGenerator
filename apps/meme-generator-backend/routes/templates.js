@@ -2,6 +2,7 @@ const { log } = require("console");
 var express = require("express");
 var router = express.Router();
 const upload = require("../middleware/multer");
+const authenticateToken = require("../middleware/authenticateToken.js");
 const Template = require("../models/Template.js");
 const ObjectId = require("mongodb").ObjectId;
 
@@ -189,7 +190,7 @@ router.get("/:id", validateID, async (req, res) => {
  *         description: Internal server error
  */
 
-router.post("/upload", upload.single("image"), async (req, res) => {
+router.post("/upload", [authenticateToken, upload.single("image")], async (req, res) => {
   console.log(req.body);
   console.log(req.file);
 

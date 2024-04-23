@@ -1,71 +1,34 @@
 import React, { useState, useEffect, useRef } from "react";
 import TextBox from "./Textbox";
-import { useTextAreas } from "./useTextField";
 import { useSpeech } from "./useSpeechToText";
 import ListeningButton from "./ListeningButton";
 import useMemeGenerator from "./useMemeGenerator";
 import TextArea from "./TextArea";
 import GeneratedMemeDialog from "./generateMemeDialog";
 import { useNavigate } from "react-router-dom";
-import ApiController from "../../data/ApiController";
-import useTemplate from "./useTemplate";
 
 // TODO upload memes privately
 function EditorWindow({
-  template: initialTemplate, meme, editing = false
+  template: initialTemplate, memeId: initialMemeId, editing = false
 }) {
   const navigate = useNavigate();
   const generate_modal_ref = useRef();
-  const [template, setTemplate] = useState(initialTemplate);
-  const {
-    textAreas,
-    addTextArea,
-    insertTextArea,
-    updateTextArea,
-    handleTextChange,
-    handleFontChange,
-    handleColorChange,
-    handleSecondaryColorChange,
-    handleTextEffectChange,
-    handleSizeChange,
-    handleItalicChange,
-    handleBoldChange,
-    handleCapitalizeChange,
-    removeTextArea,
-    handleDragAndResize,
-    clearTextAreas,
-  } = useTextAreas([]);
-  const { toSrcPath } = useTemplate();
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
+  const memeRef = useRef(null);
   const imageContainerRef = useRef(null);
-  const [isFileSizeLimited, setIsFileSizeLimited] = useState(false);
-  const [fileSizeLimit, setFileSizeLimit] = useState(1000); // KB
-  const { generateMeme, updateMeme, downloadImage, shareMeme, memeId, generatedImage, isGenerating, memeRef } = useMemeGenerator({
-    template, textAreas, imageContainerRef, name, description, fileSizeLimit, isFileSizeLimited});
+  const { template, name, setName, description, setDescription, isFileSizeLimited, setIsFileSizeLimited, fileSizeLimit, setFileSizeLimit, generateMeme, updateMeme, fetchMemeData, downloadImage, shareMeme, memeId, generatedImage, clear,
+    textAreas, addTextArea, updateTextArea, handleTextChange, handleFontChange, handleColorChange, handleSecondaryColorChange, handleTextEffectChange, handleSizeChange,
+    handleItalicChange, handleBoldChange, handleCapitalizeChange, removeTextArea, handleDragAndResize, 
+    } = useMemeGenerator({
+    initialTemplate, memeRef, imageContainerRef, initialMemeId});
+
   const { toggleListening, listening, browserSupportsSpeechRecognition, transcript,
   } = useSpeech(addTextArea, updateTextArea, removeTextArea, setName, textAreas);
-  
+
   useEffect(() => {
-    async function fetchData() {
-      console.log(meme)
-      if (editing && meme) {
-        const temp = await ApiController.fetchTemplateById(meme.templateId);
-        setTemplate({url: toSrcPath(temp.imagePath)});
-        setName(meme.title);
-        setDescription(meme.description);
-        setFileSizeLimit(meme.fileSizeLimit);
-        if(meme.textFields){
-           meme.textFields.forEach(textArea => {
-           insertTextArea(textArea);
-          });
-        }
-      }
+    if (editing && initialMemeId) {
+      fetchMemeData(initialMemeId);
     }
-    fetchData();
-  }, [editing, meme]);
-
-
+  }, [editing, initialMemeId]);
 
   const minimumSize = {
     width: 50,
@@ -192,14 +155,6 @@ function EditorWindow({
     setDescription(event.target.value);
   };
 
-  const clear = () => {
-    setName("");
-    //TODO clear useMemeGenerator
-    setFileSizeLimit(1000);
-    setIsFileSizeLimited(false);
-    clearTextAreas();
-  };
-
   const onGenerateMeme = async () => {
     try {
       generate_modal_ref.current.showModal();
@@ -212,7 +167,7 @@ function EditorWindow({
   const onShareMeme = async () => {
     try {
       if (editing) {
-        navigate(`/Single-View/${await updateMeme()}`);
+        navigate(`/Single-View/${await updateMeme(memeId)}`);
       } else {
         navigate(`/Single-View/${await shareMeme()}`);
       }

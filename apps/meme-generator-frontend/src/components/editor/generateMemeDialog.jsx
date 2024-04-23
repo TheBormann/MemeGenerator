@@ -1,4 +1,4 @@
-function GeneratedMemeDialog({ generate_modal_ref, name, generatedImage, memeRef, downloadImage, shareMeme, memeId, clear }) {  
+function GeneratedMemeDialog({ generate_modal_ref, generatedImage, memeRef, downloadImage, shareMeme, memeId }) {  
     return (
       <dialog ref={generate_modal_ref} className="modal modal-bottom sm:modal-middle">
         <div className="modal-box">
@@ -17,7 +17,7 @@ function GeneratedMemeDialog({ generate_modal_ref, name, generatedImage, memeRef
                 <button type="button" className="btn btn-outline mx-2" onClick={downloadImage} disabled={generatedImage == null}>
                   Download
                 </button>
-                <button type="button" className="btn btn-primary" onClick={shareMeme} disabled={generatedImage == null || memeId != null}>
+                <button type="button" className="btn btn-primary" onClick={shareMeme} disabled={generatedImage == null}>
                   Share
                 </button>
               </div>
