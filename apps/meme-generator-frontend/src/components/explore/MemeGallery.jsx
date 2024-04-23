@@ -88,8 +88,8 @@ const MemeGallery = ({ title, showFilter = true }) => {
             <MemeCard meme={meme} handleUpvote={handleUpvote}/>
           </div>
         ))}
-        <div className="flex justify-center align-middle h-screen w-screen">
-          <span className="loading loading-ring loading-lg mx-auto my-24"></span>
+        <div className="flex justify-center align-middle h-screen w-full">
+          <span className="loading loading-ring loading-lg my-24"></span>
         </div>
       </div>
       {showFab && (
