@@ -36,6 +36,7 @@ const useMeme = () => {
         likes: Array.isArray(img.likes) ? img.likes.length : 0,
         isLikedByUser: img.likes.includes(username),
         comments: img.comments || [],
+        
     });
 
     const fetchMemes = useCallback(async ({ filters = lastParams.filters, sorting = lastParams.sorting, append = false }) => {
@@ -66,8 +67,6 @@ const useMeme = () => {
             setLoading(false);
         }
     }, [lastParams.filters, lastParams.sorting, pageIndex]);
-    
-
 
     const fetchMemeById = async (id) => {
         setLoading(true);
@@ -146,7 +145,26 @@ const useMeme = () => {
     const handleNext = () => handleNextPrevCommon(1);
     const handlePrev = () => handleNextPrevCommon(-1);
 
-    return { image, images, loading, error, setImage, setImages, setPageIndex, fetchMemes, fetchMemeById, lastParams, handleUpvote, handleComment, handleNext, handlePrev };
+
+    const downloadImage = async () => {
+        if (image) {
+          const imageBlog = await image.blob();
+          const imageURL = URL.createObjectURL(imageBlog);
+    
+          const link = document.createElement("a");
+          link.href = imageURL;
+          link.download = image.name;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
+      };
+    
+      const shareMeme = async () => {
+
+      };
+
+    return { image, images, loading, error, setImage, setImages, setPageIndex, fetchMemes, fetchMemeById, lastParams, formatMeme, handleUpvote, handleComment, handleNext, handlePrev };
 };
 
 export default useMeme;

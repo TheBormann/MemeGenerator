@@ -7,13 +7,6 @@ const MemeFilter = ({ visible }) => {
   const [sortValue, setSortValue] = useState(lastParams.sorting || "");
   const [creationDateBefore, setCreationDateBefore] = useState(lastParams.filters?.creationDateBefore || new Date().toISOString().split('T')[0]);
 
-
-  // Logs state changes for debugging purposes
-  useEffect(() => {
-    console.log(`Search Term: ${searchTerm}, Sort: ${sortValue}, Date Before: ${creationDateBefore}`);
-  }, [searchTerm, sortValue, creationDateBefore]);
-
-  // Handle changes for all inputs using a generic handler
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     switch (name) {
@@ -28,16 +21,13 @@ const MemeFilter = ({ visible }) => {
     }
   };
 
-  // Update local state for sort
   const handleSortChange = (e) => {
     setSortValue(e.target.value);
   };
 
-  // Handle search button click
   const handleSearch = (event) => {
     fetchMemes({ filters: { keyword: searchTerm, creationDateBefore: creationDateBefore}, sorting: sortValue, append: false });
   };
-
 
   return (
       <div className={`fixed top-20 left-0 right-0 join z-30 flex justify-center ${!visible ? 'translate-y-[-100vh] transition-transform duration-500' : ''}`}>

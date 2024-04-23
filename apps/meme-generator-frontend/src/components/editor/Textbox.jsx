@@ -36,6 +36,7 @@ function TextBox({ textArea, index, handleDragStart, handleResize, removeTextAre
                     maxWidth: '100%',
                     wordWrap: 'break-word',
                 }}
+                className='select-none'
             >
                 {textArea.text}
             </div>

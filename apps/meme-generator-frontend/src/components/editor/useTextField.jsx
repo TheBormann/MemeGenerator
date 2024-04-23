@@ -19,6 +19,10 @@ export function useTextAreas(initialTextAreas) {
       };
       setTextAreas(currentTextAreas => [...currentTextAreas, newTextArea]);
     };
+
+    const insertTextArea = (textArea) => {
+        setTextAreas(currentTextAreas => [...currentTextAreas, textArea]);
+    };
   
     const updateTextArea = (index, updatedProperties) => {
       setTextAreas(currentTextAreas =>
@@ -94,6 +98,7 @@ export function useTextAreas(initialTextAreas) {
     return {
       textAreas,
       addTextArea,
+      insertTextArea,
       updateTextArea,
       handleTextChange,
       handleFontChange,

@@ -15,6 +15,7 @@ import Statistics from "../screens/Statistics.jsx";
 import SelectTemplate from "../screens/SelectTemplate.jsx";
 import UploadTemplate from "../screens/UploadTemplate.jsx";
 import { MemeProvider } from '../contexts/memeContext.jsx';
+import EditMemePage from "../screens/EditMeme.jsx";
 
 
 export const router = createBrowserRouter([
@@ -88,6 +89,15 @@ export const router = createBrowserRouter([
     element: (
       <AuthenticatedWrapper>
         <CreateMemePage />
+      </AuthenticatedWrapper>
+    ),
+    errorElement: <Error />,
+  },
+  {
+    path: "/edit-meme/:id",
+    element: (
+      <AuthenticatedWrapper>
+        <EditMemePage />
       </AuthenticatedWrapper>
     ),
     errorElement: <Error />,

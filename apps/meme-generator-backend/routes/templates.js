@@ -18,7 +18,7 @@ const validateID = (req, res, next) => {
  * /templates:
  *   get:
  *     summary: Get templates
- *     description: Retrieve templates based on author filter. The filter is an OR operator.
+ *     description: Retrieve templates based on author and keyword filters. The filters use an OR operator.
  *     tags: [Templates]
  *     parameters:
  *       - in: query
@@ -31,6 +31,15 @@ const validateID = (req, res, next) => {
  *         style: form
  *         explode: true
  *         default: ['public']
+ *       - in: query
+ *         name: keywords
+ *         description: Filter templates by keywords
+ *         schema:
+ *           type: array
+ *           items:
+ *             type: string
+ *         style: form
+ *         explode: true
  *     responses:
  *       '200':
  *         description: Successful response with templates
@@ -52,7 +61,7 @@ const validateID = (req, res, next) => {
  */
 router.get("/", async (req, res) => {
   console.log(req.query);
-  let { authors, public=true } = req.query;
+  let { authors, keywords, public=true } = req.query;
   let query = {};
 
   query['isPublic'] = public;
@@ -61,6 +70,14 @@ router.get("/", async (req, res) => {
     query['author'] = authors;
   } else if (Array.isArray(authors)) {
     query['author'] = { $in: authors };
+  }
+
+  if (keywords) {
+    if (typeof keywords === "string") {
+      query['keywords'] = { $regex: keywords, $options: 'i' };
+    } else if (Array.isArray(keywords)) {
+      query['keywords'] = { $in: keywords.map(keyword => new RegExp(keyword, 'i')) };
+    }
   }
 
   const db = req.db;

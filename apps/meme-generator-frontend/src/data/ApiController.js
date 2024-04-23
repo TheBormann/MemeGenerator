@@ -52,6 +52,29 @@ const ApiController = {
     }
   },
 
+  async updateMeme(memeId, formData) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/memes/${memeId}`, {
+        method: "POST",
+        body: formData,
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem("authToken")}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "An unknown error occurred during meme update");
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+
   async fetchMemeById(memeId) {
     try {
       const response = await fetch(`${API_BASE_URL}/memes/${memeId}`, {

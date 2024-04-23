@@ -23,6 +23,7 @@ const Navbar = (props) => {
               src="/src/assets/title.gif"
               alt="logo"
               className="h-10 w-10 rounded-md"
+              draggable="false"
             />
           </Link>
         </div>

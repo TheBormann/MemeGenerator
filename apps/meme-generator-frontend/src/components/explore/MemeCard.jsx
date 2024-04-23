@@ -50,7 +50,7 @@ const MemeCard = ({ meme, handleUpvote }) => {
   }
 
   return (
-      <div className="card lg:card-side bg-base-100 h-screen pt-48 lg:pt-24">
+      <div className="card select-none lg:card-side bg-base-100 h-screen pt-48 lg:pt-24">
         <Link to={`/Single-View/${meme.id}`}
           ref={cardRef}
           className={`backdrop-blur-3xl lg:h-[85vh] h-[60vh] max-w-screen-lg w-full flex justify-center relative cursor-pointer my-auto`}

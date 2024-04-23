@@ -6,14 +6,19 @@ import ListeningButton from "./ListeningButton";
 import useMemeGenerator from "./useMemeGenerator";
 import TextArea from "./TextArea";
 import GeneratedMemeDialog from "./generateMemeDialog";
+import { useNavigate } from "react-router-dom";
 
+// TODO upload memes privately
 function EditorWindow({
-  template
+  template: initialTemplate, meme, editing = false
 }) {
-  const [editingState, setEditingState] = useState("select");
+  const navigate = useNavigate();
+  const generate_modal_ref = useRef();
+  const [template, setTemplate] = useState(initialTemplate);
   const {
     textAreas,
     addTextArea,
+    insertTextArea,
     updateTextArea,
     handleTextChange,
     handleFontChange,
@@ -28,27 +33,32 @@ function EditorWindow({
     handleDragAndResize,
     clearTextAreas,
   } = useTextAreas([]);
-
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const imageContainerRef = useRef(null);
   const [isFileSizeLimited, setIsFileSizeLimited] = useState(false);
   const [fileSizeLimit, setFileSizeLimit] = useState(1000); // KB
-  const { generateMeme, downloadImage, shareMeme, uploadedLink, generatedImage, isGenerating, memeRef } = useMemeGenerator({
-    template,
-    textAreas,
-    imageContainerRef,
-    name,
-    description,
-    fileSizeLimit,
-    isFileSizeLimited,
-  });
-
+  const { generateMeme, updateMeme, downloadImage, shareMeme, memeId, generatedImage, isGenerating, memeRef } = useMemeGenerator({
+    template, textAreas, imageContainerRef, name, description, fileSizeLimit, isFileSizeLimited});
   const { toggleListening, listening, browserSupportsSpeechRecognition, transcript,
   } = useSpeech(addTextArea, updateTextArea, removeTextArea, setName, textAreas);
-
-  const [showModal, setShowModal] = useState(false);
   
+  useEffect(() => {
+    console.log(meme)
+    if (editing && meme) {
+      setTemplate(meme.template);
+      setName(meme.title);
+      setDescription(meme.description);
+      setFileSizeLimit(meme.fileSizeLimit);
+      if(meme.textFields){
+         meme.textFields.forEach(textArea => {
+         insertTextArea(textArea);
+        });
+      }
+    }
+  }, [editing, meme]);
+
+
 
   const minimumSize = {
     width: 50,
@@ -56,13 +66,6 @@ function EditorWindow({
   };
 
   const fonts = ["Arial", "Impact", "Comic Sans MS", "Montserrat"];
-
-  useEffect(() => {
-    if (template) {
-      setEditingState("edit");
-    }
-  }, [template]);
-
 
   const handleResize = (event, corner, index) => {
     const container = event.target.parentNode;
@@ -183,7 +186,6 @@ function EditorWindow({
   };
 
   const clear = () => {
-    setEditingState("edit");
     setName("");
     //TODO clear useMemeGenerator
     setFileSizeLimit(1000);
@@ -192,10 +194,13 @@ function EditorWindow({
   };
 
   const onGenerateMeme = async () => {
-    
     try {
-      setShowModal(true);
-      await generateMeme();
+      generate_modal_ref.current.showModal();
+      if (editing) {
+        await updateMeme();
+      } else {
+        await generateMeme();
+      }
     } catch (error) {
       console.error("Error generating meme:", error);
     }
@@ -203,8 +208,7 @@ function EditorWindow({
 
   const onShareMeme = async () => {
     try {
-      await shareMeme();
-      setEditingState("save");
+      navigate(`/Single-View/${await shareMeme()}`);
     } catch {
 
     }
@@ -217,38 +221,37 @@ function EditorWindow({
             type="text"
             placeholder="Meme name"
             className="input input-bordered w-full mb-6 max-w-xl mx-auto"
-            value={name}
+            value={name || ''}
             onChange={(event) => handleMemeNameChange(event)}
           />
           <div className="meme-editor-container flex justify-center h-full relative group/imgContainer px-3">
-            {template ? (
-              <div className="my-auto">
-                <div
-                  className=" relative"
-                  id="editing-container"
-                  ref={imageContainerRef}
-                >
-                  <img
-                    crossOrigin="anonymous"
-                    src={template.url}
-                    alt="DraftImage"
-                    className="object-scale-down h-full"
-                  />
-                  {textAreas.map((textArea, index) => (
-                    <TextBox
-                      key={index}
-                      textArea={textArea}
-                      index={index}
-                      handleDragStart={handleDragStart}
-                      removeTextArea={removeTextArea}
-                      handleResize={handleResize}
-                    ></TextBox>
-                  ))}
-                </div>
+          {template ? (
+            <div className="my-auto">
+              <div className="relative" id="editing-container" ref={imageContainerRef}>
+                <img
+                  crossOrigin="anonymous"
+                  src={template.url}  // Use template URL when not editing
+                  alt="template"
+                  draggable="false"
+                  className="object-scale-down h-full lg:max-h-[70vh]"
+                />
+                {textAreas.map((textArea, index) => (
+                  <TextBox
+                    key={index}
+                    textArea={textArea}
+                    index={index}
+                    handleDragStart={handleDragStart}
+                    removeTextArea={removeTextArea}
+                    handleResize={handleResize}
+                  ></TextBox>
+                ))}
               </div>
-            ) : (
-              <span className="loading loading-spinner m-auto w-1/4"></span>
-            )}
+            </div>
+          ) : (
+            <div className="h-80 flex justify-center align-middle">
+              <span className="loading loading-ring"></span>
+            </div>
+          )}
           </div>
         </div>
 
@@ -260,7 +263,7 @@ function EditorWindow({
           value={description}
           onChange={(event) => handleMemeDescriptionChange(event)}
         />
-        <div className=" flex flex-col lg:flex-row justify-between p-3 m-2 gap-4 ">
+        <div className=" flex flex-col justify-between p-3 m-2 gap-4 ">
           <div className="flex flex-col gap-1">
             <button className="btn w-fit mx-auto" onClick={() => addTextArea()}>
               Add Text Area
@@ -294,7 +297,7 @@ function EditorWindow({
               />
             ))}
           </div>
-          <div className="flex flex-col items-center lg:items-end gap-2">
+          <div className="flex flex-col items-center gap-2">
             <div className="flex gap-1">
               <div className="flex gap-4 align-middle">
                 <div className="form-control">
@@ -351,25 +354,28 @@ function EditorWindow({
                 </form>
               </div>
             </div>
+            <form method="dialog" className="modal-backdrop">
+              <button>close</button>
+            </form>
           </dialog>
           <button
             className="btn btn-primary"
             disabled={!name}
             onClick={onGenerateMeme}
           >
-            Generate Meme
+            {editing ? "Update Meme" : "Create Meme"}
           </button>
           <GeneratedMemeDialog
-            isOpen={showModal}
+            generate_modal_ref={generate_modal_ref}
             name={name}
             generatedImage={generatedImage}
+            memeId={memeId}
             memeRef={memeRef}
             downloadImage={downloadImage}
-            shareMeme={shareMeme}
-            uploadedLink={uploadedLink}
+            shareMeme={onShareMeme}
             clear={() => {
               clear();
-              setShowModal(false);
+              generate_modal_ref.current.showModal();
             }}
           />
           <ListeningButton

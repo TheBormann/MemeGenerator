@@ -1,17 +1,15 @@
-function GeneratedMemeDialog({ isOpen, name, generatedImage, memeRef, downloadImage, shareMeme, uploadedLink, clear }) {
-    if (!isOpen) return null;
-  
+function GeneratedMemeDialog({ generate_modal_ref, name, generatedImage, memeRef, downloadImage, shareMeme, memeId, clear }) {  
     return (
-      <dialog id="generated_meme_modal" className="modal modal-bottom sm:modal-middle" open={isOpen}>
+      <dialog ref={generate_modal_ref} className="modal modal-bottom sm:modal-middle">
         <div className="modal-box">
-          <h2 className="font-bold text-2xl mb-3">New Meme: {name}</h2>
+          <h2 className="font-bold text-2xl mb-3">Your Meme</h2>
+          <p className="mb-4">
+            Download it or share it online!
+          </p>
           {generatedImage == null ? (
-            <span className="loading loading-spinner m-auto w-1/4 relative left-1/2 -translate-x-1/2"></span>
+            <span className="loading loading-ring m-auto my-[20%] relative left-1/2 -translate-x-1/2"></span>
           ) : (
-            <>
-              <img ref={memeRef} src={generatedImage} alt="Generated Meme" />
-              <div className="pt-2"></div>
-            </>
+            <img ref={memeRef} src={generatedImage} alt="Generated Meme" />
           )}
           <div className="modal-action">
             <div className="flex flex-col items-end gap-2">
@@ -19,24 +17,16 @@ function GeneratedMemeDialog({ isOpen, name, generatedImage, memeRef, downloadIm
                 <button type="button" className="btn btn-outline mx-2" onClick={downloadImage} disabled={generatedImage == null}>
                   Download
                 </button>
-                <button type="button" className="btn btn-primary" onClick={shareMeme} disabled={generatedImage == null || uploadedLink != null}>
+                <button type="button" className="btn btn-primary" onClick={shareMeme} disabled={generatedImage == null || memeId != null}>
                   Share
                 </button>
               </div>
-              {uploadedLink && (
-                <div className="join">
-                  <span className="label text-label input input-bordered join-item">{uploadedLink}</span>
-                  <button className="btn join-item" onClick={() => navigator.clipboard.writeText(uploadedLink)}>
-                    Copy
-                  </button>
-                </div>
-              )}
             </div>
-            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onClick={clear}>
-              ✕
-            </button>
           </div>
         </div>
+        <form method="dialog" className="modal-backdrop">
+          <button>close</button>
+        </form>
       </dialog>
     );
   }
