@@ -7,6 +7,8 @@ import useMemeGenerator from "./useMemeGenerator";
 import TextArea from "./TextArea";
 import GeneratedMemeDialog from "./generateMemeDialog";
 import { useNavigate } from "react-router-dom";
+import ApiController from "../../data/ApiController";
+import useTemplate from "./useTemplate";
 
 // TODO upload memes privately
 function EditorWindow({
@@ -33,6 +35,7 @@ function EditorWindow({
     handleDragAndResize,
     clearTextAreas,
   } = useTextAreas([]);
+  const { toSrcPath } = useTemplate();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const imageContainerRef = useRef(null);
@@ -44,18 +47,22 @@ function EditorWindow({
   } = useSpeech(addTextArea, updateTextArea, removeTextArea, setName, textAreas);
   
   useEffect(() => {
-    console.log(meme)
-    if (editing && meme) {
-      setTemplate(meme.template);
-      setName(meme.title);
-      setDescription(meme.description);
-      setFileSizeLimit(meme.fileSizeLimit);
-      if(meme.textFields){
-         meme.textFields.forEach(textArea => {
-         insertTextArea(textArea);
-        });
+    async function fetchData() {
+      console.log(meme)
+      if (editing && meme) {
+        const temp = await ApiController.fetchTemplateById(meme.templateId);
+        setTemplate({url: toSrcPath(temp.imagePath)});
+        setName(meme.title);
+        setDescription(meme.description);
+        setFileSizeLimit(meme.fileSizeLimit);
+        if(meme.textFields){
+           meme.textFields.forEach(textArea => {
+           insertTextArea(textArea);
+          });
+        }
       }
     }
+    fetchData();
   }, [editing, meme]);
 
 
@@ -196,11 +203,7 @@ function EditorWindow({
   const onGenerateMeme = async () => {
     try {
       generate_modal_ref.current.showModal();
-      if (editing) {
-        await updateMeme();
-      } else {
-        await generateMeme();
-      }
+      await generateMeme();
     } catch (error) {
       console.error("Error generating meme:", error);
     }
@@ -208,7 +211,11 @@ function EditorWindow({
 
   const onShareMeme = async () => {
     try {
-      navigate(`/Single-View/${await shareMeme()}`);
+      if (editing) {
+        navigate(`/Single-View/${await updateMeme()}`);
+      } else {
+        navigate(`/Single-View/${await shareMeme()}`);
+      }
     } catch {
 
     }

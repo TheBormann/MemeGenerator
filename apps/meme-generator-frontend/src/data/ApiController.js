@@ -220,6 +220,29 @@ const ApiController = {
     }
   },
 
+  async fetchTemplateById(templateId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/templates/${templateId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Headers":
+            "Origin, X-Requested-With, Content-Type, Accept",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch meme");
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
   async signUp(formData) {
     try {
       console.log(formData);

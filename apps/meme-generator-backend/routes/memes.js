@@ -268,7 +268,7 @@ router.get("/", async (req, res) => {
  *                       "fileTargetSize": 2000000,
  *                       "publishMode": "public",
  *                       "fileType": "image",
- *                       "usedTemplates": "Finding Neverland"
+ *                       "tempalteId": "1dad3idasd"
  *                     }
  *       responses:
  *         '201':
@@ -289,6 +289,7 @@ router.get("/", async (req, res) => {
 router.post("/upload", upload.single("image"), async (req, res) => {
   try {
     const memeData = JSON.parse(req.body.memeObject);
+    console.log(memeData);
 
     const newMeme = new Meme(
       memeData.name,
@@ -298,8 +299,8 @@ router.post("/upload", upload.single("image"), async (req, res) => {
       memeData.textAreas,
       memeData.size,
       memeData.targetFileSize,
-      Meme.PublishState[memeData.publishMode.toUpperCase()], // Ensure correct access
-      Meme.FileType[memeData.fileType.toUpperCase()], // Ensure correct access
+      Meme.PublishState[memeData.publishMode.toUpperCase()],
+      Meme.FileType[memeData.fileType.toUpperCase()],
       memeData.templateId
     );
 

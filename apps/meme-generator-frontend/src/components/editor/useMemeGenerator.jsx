@@ -37,6 +37,7 @@ const useMemeGenerator = ({ template, textAreas, imageContainerRef, name, descri
       const formData = new FormData();
       formData.append("image", blob, `${name}.png`);
       formData.append("memeObject", JSON.stringify(constructMemeObject()));
+      console.log("Meme object:", constructMemeObject());
   
       try {
         const response = await ApiController.createMeme(formData);
@@ -93,7 +94,7 @@ const useMemeGenerator = ({ template, textAreas, imageContainerRef, name, descri
           height: imageContainerRef.current.getBoundingClientRect().height,
         },
         author: SessionManager.getUserName(),
-        template: "Used template",
+        templateId: template.id,
         targetFileSize: 2_000_000,
         publishMode: "public",
         fileType: "image",

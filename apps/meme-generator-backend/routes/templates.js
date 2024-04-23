@@ -153,6 +153,7 @@ router.get("/:id", validateID, async (req, res) => {
       return res.status(404).json({ error: "Template or image not found" });
     }
     res.status(200).json(template);
+    console.log(template);
   } catch (error) {
     console.error("Error fetching image:", error);
     res.status(500).json({ error: "Internal server error" });

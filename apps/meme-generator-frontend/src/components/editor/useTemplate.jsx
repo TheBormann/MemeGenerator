@@ -53,7 +53,7 @@ const useTemplate = () => {
     });
   }
 
-  return { templates, loading, filterOptions, onFilterChange };
+  return { templates, loading, filterOptions, onFilterChange, toSrcPath };
 };
 
 export default useTemplate;

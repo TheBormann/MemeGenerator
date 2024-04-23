@@ -21,7 +21,7 @@ class Meme {
     fileTargetSize = 2_000_000, // 2 MB
     publishState = PublishState.PUBLIC,
     fileType = FileType.IMAGE,
-    usedTemplates = []
+    templateId,
   ) {
     this.title = title;
     this.imageURL = imageURL;
@@ -32,7 +32,7 @@ class Meme {
     this.fileTargetSize = fileTargetSize;
     this.publishState = publishState;
     this.fileType = fileType;
-    this.usedTemplates = usedTemplates;
+    this.templateId = templateId;
     this.createdAt = new Date();
     this.comments = [];
     this.likes = [];
