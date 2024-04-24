@@ -1,7 +1,6 @@
 require("dotenv").config();
 const nodemailer = require("nodemailer");
 
-//TODO Replace with your own SMTP details
 async function sendPasswordResetEmail(userEmail, resetToken) {
   console.log({
     host: process.env.EMAIL_HOST, // Replace with your mail server host
@@ -23,7 +22,6 @@ async function sendPasswordResetEmail(userEmail, resetToken) {
     },
   });
 
-  //TODO change link to link of front-end website
   // Email content
   let mailOptions = {
     from: `"Meme Generator" ${process.env.EMAIL_AUTH_USER}`,

@@ -37,7 +37,9 @@ const Login = () => {
           src="/src/assets/title.gif"
           alt="logo"
           className="w-48 rounded-2xl"
+          draggable="false"
         />
+        <h1 className=" font-bold text-5xl mt-12">Meme Generator</h1>
         <div className="w-full sm:max-w-md md:mt-0 xl:p-0">
           <div className="space-y-4 p-6 sm:p-8 md:space-y-6">
             <h1 className="text-gray-900 dark:text-white text-xl font-bold leading-tight tracking-tight md:text-2xl">

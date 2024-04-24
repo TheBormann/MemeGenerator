@@ -24,7 +24,6 @@ var signupRouter = require("./routes/signUp");
 var resetPasswordRouter = require("./routes/resetPassword");
 var getUserDataRouter = require("./routes/getUserData");
 var updateUserDataRouter = require("./routes/updateUserData");
-var usermemesRouter = require("./routes/getUserMemes");
 
 var bodyParser = require("body-parser");
 
@@ -89,7 +88,6 @@ app.use("/signup", signupRouter);
 app.use("/reset-password", resetPasswordRouter);
 app.use("/getUserData", getUserDataRouter);
 app.use("/updateUserData", updateUserDataRouter);
-app.use("/getUserMemes", usermemesRouter);
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));

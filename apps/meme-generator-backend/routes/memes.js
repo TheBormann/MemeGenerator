@@ -8,6 +8,7 @@ const authenticateToken = require("../middleware/authenticateToken.js");
 const ObjectId = require("mongodb").ObjectId;
 const fs = require("fs");
 const sharp = require("sharp"); //for resizing
+const { error } = require("console");
 
 //const imageZipper = require("../tools/imageZipper");
 
@@ -478,7 +479,7 @@ router.post(
   [authenticateToken, upload.single("image"), verifyAuthor],
   async (req, res) => {
     if (!req.params.id || !ObjectId.isValid(req.params.id)) {
-      return res.status(400).send("Invalid or missing meme ID.");
+      return res.status(400).send({error: "Invalid or missing meme ID."});
     }
 
     try {
@@ -518,7 +519,7 @@ router.post(
       );
 
       if (!updatedMeme) {
-        return res.status(404).send("Meme not found.");
+        return res.status(404).send({error: "Meme not found."});
       }
 
       // Append the domain to the imageURL for accessibility
@@ -528,7 +529,7 @@ router.post(
       res.json({ message: "Meme updated successfully", meme: updatedMeme });
     } catch (error) {
       console.error("Error updating meme:", error);
-      res.status(500).send("Internal server error.");
+      res.status(500).send({error: "Internal server error."});
     }
   }
 );
@@ -598,7 +599,7 @@ router.post(
       res.status(200).json({ message: `Like ${action} successfully`, meme });
     } catch (error) {
       console.error("Error adding like:", error);
-      res.status(500).json({ message: "Internal server error" });
+      res.status(500).json({ error: "Internal server error" });
     }
   }
 );
@@ -676,9 +677,84 @@ router.post(
       res.status(200).json({ message: "Comment added successfully", meme });
     } catch (error) {
       console.error("Error adding comment:", error);
-      res.status(500).json({ message: "Internal server error" });
+      res.status(500).json({ error: "Internal server error" });
     }
   }
 );
+
+/**
+ * @swagger
+ * /memes/{id}:
+ *   delete:
+ *     summary: Delete a meme
+ *     description: Deletes a meme based on its unique identifier. Only the author or an authorized user can delete the meme.
+ *     tags:
+ *       - Memes
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         type: string
+ *         description: The unique identifier of the meme to delete.
+ *     responses:
+ *       200:
+ *         description: Meme deleted successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Meme deleted successfully'
+ *       404:
+ *         description: Meme not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: 'Meme not found'
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: 'Internal server error'
+ *     security:
+ *       - bearerAuth: []
+ */
+router.delete('/delete/:id', [authenticateToken, verifyAuthor], async (req, res) => {
+  const { id } = req.params;
+  const db = req.db;
+  const memes = db.get('memes');
+
+  try {
+    // Verify that the meme exists
+    const meme = await memes.findOne({ _id: id });
+    if (!meme) {
+      return res.status(404).json({ error: 'Meme not found' });
+    }
+
+    await memes.remove({ _id: id });
+
+    const imagePath = `./public/${meme.imageURL}`;
+    if (fs.existsSync(imagePath)) {
+      fs.unlinkSync(imagePath);
+    }
+
+    res.status(200).json({ message: 'Meme deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting meme:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 
 module.exports = router;

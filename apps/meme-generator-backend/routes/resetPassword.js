@@ -33,7 +33,7 @@ const router = express.Router();
 router.post("/", async (req, res) => {
   const { email } = req.body;
   if (!email) {
-    return res.status(400).json({ message: "Email is required" });
+    return res.status(400).json({ error: "Email is required" });
   }
 
   const db = req.db;
@@ -99,7 +99,7 @@ router.post("/:token", async (req, res) => {
   const { newPassword } = req.body;
 
   if (!newPassword) {
-    return res.status(400).json({ message: "New password is required" });
+    return res.status(400).json({ error: "New password is required" });
   }
 
   const db = req.db;
@@ -110,7 +110,7 @@ router.post("/:token", async (req, res) => {
   });
 
   if (!existingUser) {
-    return res.status(400).json({ message: "Invalid or expired token" });
+    return res.status(400).json({ error: "Invalid or expired token" });
   }
 
   // Update the user's password

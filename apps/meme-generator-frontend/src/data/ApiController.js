@@ -218,6 +218,22 @@ const ApiController = {
     }
   },
 
+  async deleteMeme(memeId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/memes/delete/${memeId}`, {
+        method: "DELETE",
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Headers":
+            "Origin, X-Requested-With, Content-Type, Accept",
+          Authorization: `Bearer ${sessionStorage.getItem("authToken")}`,
+        },
+      });
+    } catch (error) {
+      throw error;
+    }
+  },
+
   async fetchAllTemplates(authors, isPublic = true) {
     //TODO implement keyword search
     try {

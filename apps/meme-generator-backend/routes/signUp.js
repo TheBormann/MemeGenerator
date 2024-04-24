@@ -91,7 +91,7 @@ router.post("/", async (req, res) => {
       res.status(400).json({ message: "Invalid user data" });
     } else {
       console.error("Error signing up:", error);
-      res.status(500).json({ message: "Internal server error" });
+      res.status(500).json({ error: "Internal server error" });
     }
   }
 });

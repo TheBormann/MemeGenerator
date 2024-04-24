@@ -16,20 +16,20 @@ async function verifyAuthor(req, res, next) {
     const user = await users.findOne({ _id: ObjectId(userId) });
 
     if (!meme) {
-      return res.status(404).send("Meme not found.");
+      return res.status(404).send({error: "Meme not found."});
     }
 
     if (meme.author.toString() !== user.username.toString()) {
       return res
         .status(403)
-        .send("You are not authorized to update this meme.");
+        .send({error: "You are not authorized to update this meme."});
     }
 
     req.meme = meme;
     next(); // User is authorized
   } catch (error) {
     console.error("Authorization error:", error);
-    res.status(500).send("Internal server error.");
+    res.status(500).send({error: "Internal server error."});
   }
 }
 

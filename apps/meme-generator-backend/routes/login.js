@@ -63,7 +63,7 @@ router.post("/", async (req, res) => {
     const users = db.get("users");
     const user = await users.findOne({ email: req.body.email });
     if (!user || !bcrypt.compareSync(req.body.password, user.password)) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(401).json({ error: "Invalid credentials" });
     }
 
     const claims = { userId: user._id };
@@ -77,7 +77,7 @@ router.post("/", async (req, res) => {
     res.send({ token, expiration });
   } catch (error) {
     console.error("Error logging in:", error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ error: "Server error" });
   }
 });
 

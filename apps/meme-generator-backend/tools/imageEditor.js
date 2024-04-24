@@ -63,7 +63,6 @@ export default class ImageEditor {
   }
 
   hexToRgb(hex) {
-    // Convert hex color to RGB format
     hex = hex.replace(/^#/, "");
     const bigint = parseInt(hex, 16);
     const r = (bigint >> 16) & 255;
