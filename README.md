@@ -4,9 +4,7 @@ A full stack application to showcase the implementation of most relevant web ser
 Demonstrated through a meme creator, allowing you to design memes and share it with other people!
 
 
-<video src="MemeGenerator.mp4" controls="controls" style="max-width: 100%;">
-  Your browser does not support the video tag.
-</video>
+https://github.com/TheBormann/MemeGenerator/assets/44904320/2d8642cc-98ad-4185-a8ef-f693cc72c6f8
 
 ## Implemented technologies
 - Secure login and registration
