@@ -21,10 +21,9 @@ const UploadTemplate = () => {
         setTemplateName(event.target.value);
     };
 
-    const handleFileChange = async (event) => {
+    const handleFileChange = async (file) => {
         setLoading(true);
-        const uploadedFile = event.target.files[0];
-        if (!uploadedFile || !['image/jpeg', 'image/png', 'image/gif'].includes(uploadedFile.type)) {
+        if (!file || !['image/jpeg', 'image/png', 'image/gif'].includes(file.type)) {
             setLoading(false);
             return;
         }
@@ -32,9 +31,14 @@ const UploadTemplate = () => {
         fileReader.onload = () => {
             setPreviewUrl(fileReader.result); // Set the preview URL to the file content
         };
-        fileReader.readAsDataURL(uploadedFile);
-        setFile(uploadedFile);
+        fileReader.readAsDataURL(file);
+        setFile(file);
         setLoading(false);
+    };
+
+    const handleFileInputChange = (event) => {
+        const uploadedFile = event.target.files[0];
+        handleFileChange(uploadedFile);
     };
 
     const handleUpload = async () => {
@@ -59,6 +63,18 @@ const UploadTemplate = () => {
         setLoading(false);
     };
 
+    const handleDragOver = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+    };
+
+    const handleDrop = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const uploadedFile = event.dataTransfer.files[0];
+        handleFileChange(uploadedFile);
+    };
+
     return (
         <BaseLayout showFooter={false} className="pt-0">
             <div className="container min-h-screen w-full px-6 flex flex-col align-top justify-left md:align-middle md:px-12 mx-auto">
@@ -73,7 +89,12 @@ const UploadTemplate = () => {
                         value={templateName}
                         onChange={handleTemplateNameChange}
                     />
-                    <label htmlFor="dropzone-file" className="flex flex-col max-w-xl items-center justify-center w-full min-h-96 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
+                    <label
+                        htmlFor="dropzone-file"
+                        className="flex flex-col max-w-xl items-center justify-center w-full min-h-96 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+                        onDragOver={handleDragOver}
+                        onDrop={handleDrop}
+                    >
                         {previewUrl ? (
                             <img src={previewUrl} alt="Uploaded Image" className="h-full w-full object-cover rounded-lg" />
                         ) : (
@@ -85,7 +106,7 @@ const UploadTemplate = () => {
                                 <p className="text-xs text-gray-500 dark:text-gray-400">PNG, JPG or GIF (MAX. 800x400px)</p>
                             </div>
                         )}
-                        <input id="dropzone-file" type="file" className="hidden" onChange={handleFileChange}/>
+                        <input id="dropzone-file" type="file" className="hidden" onChange={handleFileInputChange}/>
                     </label>
                 </div> 
                 <button
