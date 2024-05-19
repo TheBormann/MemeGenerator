@@ -3,6 +3,11 @@
 A full stack application to showcase the implementation of most relevant web service technologies.
 Demonstrated through a meme creator, allowing you to design memes and share it with other people!
 
+
+<video src="MemeGenerator.mp4" controls="controls" style="max-width: 100%;">
+  Your browser does not support the video tag.
+</video>
+
 ## Implemented technologies
 - Secure login and registration
 - Image manipulation
