@@ -16,21 +16,19 @@ function TextArea({
   fonts
 }) {
   return (
-    <div
-    className="flex flex-col space-x-2 mb-2 rounded-lg p-2"
-    key={index}
-    >
-    <label className="lael-text text-xs px-2">
-        Textbox #{index + 1}
-    </label>
-    <div className="flex items-center gap-1">
-        <textarea
-        className="textarea textarea-bordered rounded-2xl w-full"
-        value={textArea.text}
-        onChange={(event) => handleTextChange(event, index)}
-        placeholder="Enter text here"
-        />
-        <div className="flex-flex-col">
+    <div className="flex gap-1 justify-center align-middle w-full max-w-xl mx-auto" key={index}>
+        <div className='flex flex-col space-x-2 mb-2 rounded-lg pr-2 w-full'>
+            <label className="label-text text-xs px-2">
+                Textbox #{index + 1}
+            </label>
+            <textarea
+            className="textarea textarea-bordered rounded-2xl w-full"
+            value={textArea.text}
+            onChange={(event) => handleTextChange(event, index)}
+            placeholder="Enter text here"
+            />
+        </div>
+        <div className="flex flex-col my-auto">
         <input
             type="color"
             value={textArea.color}
@@ -45,7 +43,7 @@ function TextArea({
         />
         </div>
 
-        <div className="dropdown dropdown-bottom dropdown-end">
+        <div className="dropdown dropdown-bottom dropdown-end my-auto">
         <div tabIndex={0} role="button" className="btn btn-circle">
             <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -169,7 +167,7 @@ function TextArea({
         </div>
 
         <button
-        className="btn btn-circle btn-outline"
+        className="btn btn-circle btn-outline my-auto"
         onClick={() => removeTextArea(index)}
         >
         <svg
@@ -187,7 +185,6 @@ function TextArea({
             />
         </svg>
         </button>
-    </div>
     </div>
   );
 }
